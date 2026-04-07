@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block title %}Home · LoreWiki Studio{% endblock %}
+{% block content %}
+<section class="fandom-hero card">
+    <div class="hero-copy">
+        <div class="eyebrow">Welcome to your world archive</div>
+        <h1>Build a personal wiki that feels like a real series hub</h1>
+        <p class="muted">
+            Organize characters, factions, power systems, events, worldbuilding, plotlines, timelines, and research in one connected place.
+        </p>
+        <div class="hero-actions">
+            <a class="button primary" href="{{ url_for('create_page') }}">Create page</a>
+            <a class="button" href="{{ url_for('create_plotline') }}">Add plotline</a>
+            <a class="button" href="{{ url_for('timelines') }}">Open timelines</a>
+        </div>
+    </div>
+    <div class="hero-panel">
+        <div class="warning-box">
+            <strong>Writer note</strong>
+            <p>This layout is built for original worlds and story planning, with fandom-style browsing, infoboxes, linked articles, starter templates, and visual chronology.</p>
+        </div>
+        <div class="stats-grid compact-stats">
+            <article class="stat-card"><span class="stat-label">Pages</span><strong>{{ totals.pages }}</strong></article>
+            <article class="stat-card"><span class="stat-label">Plotlines</span><strong>{{ totals.plotlines }}</strong></article>
+            <article class="stat-card"><span class="stat-label">Sources</span><strong>{{ totals.bibliography }}</strong></article>
+            <article class="stat-card"><span class="stat-label">Tags</span><strong>{{ totals.tags }}</strong></article>
+        </div>
+    </div>
+</section>
+
+<section class="portal-grid three-up">
+    <a class="portal-card" href="{{ url_for('create_page', type='character') }}"><span>Characters</span><small>Leads, rivals, mentors, villains, side cast</small></a>
+    <a class="portal-card" href="{{ url_for('create_page', type='faction') }}"><span>Factions</span><small>Organizations, houses, schools, divisions</small></a>
+    <a class="portal-card" href="{{ url_for('create_page', type='location') }}"><span>Locations</span><small>Cities, bases, schools, realms, countries</small></a>
+    <a class="portal-card" href="{{ url_for('create_page', type='magic-system') }}"><span>Power System</span><small>Abilities, contracts, techniques, rules</small></a>
+    <a class="portal-card" href="{{ url_for('create_page', type='event') }}"><span>Events</span><small>Incidents, battles, arcs, disasters</small></a>
+    <a class="portal-card" href="{{ url_for('starter_kits') }}"><span>Starter Kits</span><small>Guided templates for pages, arcs, and sources</small></a>
+</section>
+
+<div class="two-col">
+    <section class="card">
+        <div class="section-head">
+            <div>
+                <div class="eyebrow">Featured content</div>
+                <h2>Recently updated pages</h2>
+            </div>
+            <a href="{{ url_for('list_pages') }}">View all</a>
+        </div>
+        {% if recent_pages %}
+            <div class="stack">
+                {% for page in recent_pages %}
+                <article class="list-card fandom-list-card">
+                    <div class="list-card-main">
+                        <div class="type-pill">{{ page.page_type }}</div>
+                        <a class="list-title" href="{{ url_for('view_page', slug=page.slug) }}">{{ page.title }}</a>
+                        <p class="muted small">{{ page.status }} · Updated {{ page.updated_at }}</p>
+                        {% if page.summary %}<p>{{ page.summary }}</p>{% endif %}
+                    </div>
+                    {% if page.tags %}
+                    <div class="tag-row">
+                        {% for tag in page.tags.split(', ') %}
+                        {% if tag %}<a class="tag" href="{{ url_for('list_pages', tag=tag) }}">{{ tag }}</a>{% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="empty-state">No pages yet. Start with a protagonist, power system, faction, or world history page.</p>
+        {% endif %}
+    </section>
+
+    <section class="card">
+        <div class="section-head">
+            <div>
+                <div class="eyebrow">Archive</div>
+                <h2>Collection breakdown</h2>
+            </div>
+        </div>
+        {% if page_counts %}
+            <ul class="breakdown-list styled-breakdown">
+                {% for row in page_counts %}
+                <li><span>{{ row.page_type }}</span><strong>{{ row.count }}</strong></li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="empty-state">Counts will appear after you start creating pages.</p>
+        {% endif %}
+    </section>
+</div>
+
+<div class="two-col">
+    <section class="card">
+        <div class="section-head">
+            <div>
+                <div class="eyebrow">Chronology</div>
+                <h2>Timeline preview</h2>
+            </div>
+            <a href="{{ url_for('timelines') }}">Open timelines</a>
+        </div>
+        {% if timeline_preview %}
+            <ol class="timeline preview-timeline">
+                {% for entry in timeline_preview %}
+                <li>
+                    <div class="timeline-card">
+                        <div class="timeline-kicker">{{ entry.era }}{% if entry.order is not none %} · {{ entry.order|int if entry.order == entry.order|int else entry.order }}{% endif %}</div>
+                        <a class="list-title" href="{{ url_for('view_page', slug=entry.slug) }}">{{ entry.label }}</a>
+                        <p class="muted small">{{ entry.title }}</p>
+                        {% if entry.summary %}<p>{{ entry.summary }}</p>{% endif %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ol>
+        {% else %}
+            <p class="empty-state">Create event pages and give them <code>Timeline Era</code> and <code>Timeline Order</code> infobox fields to populate this.</p>
+        {% endif %}
+    </section>
+
+    <section class="card">
+        <div class="section-head">
+            <div>
+                <div class="eyebrow">Story progress</div>
+                <h2>Recent plotlines</h2>
+            </div>
+            <a href="{{ url_for('list_plotlines') }}">View all</a>
+        </div>
+        {% if recent_plotlines %}
+            <div class="stack">
+                {% for plotline in recent_plotlines %}
+                <article class="list-card fandom-list-card">
+                    <div class="type-pill gold">{{ plotline.status }}</div>
+                    <a class="list-title" href="{{ url_for('view_plotline', plotline_id=plotline.id) }}">{{ plotline.title }}</a>
+                    {% if plotline.summary %}<p>{{ plotline.summary }}</p>{% endif %}
+                </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="empty-state">No plotlines yet.</p>
+        {% endif %}
+    </section>
+</div>
+
+<section class="card">
+    <div class="section-head">
+        <div>
+            <div class="eyebrow">Research shelf</div>
+            <h2>Recent sources</h2>
+        </div>
+        <a href="{{ url_for('list_bibliography') }}">View all</a>
+    </div>
+    {% if recent_sources %}
+        <div class="stack">
+            {% for entry in recent_sources %}
+            <article class="list-card fandom-list-card">
+                <div class="type-pill muted-pill">{{ entry.entry_type }}</div>
+                <strong>{{ entry.title }}</strong>
+                <p class="muted small">{{ entry.author }}{% if entry.year %} · {{ entry.year }}{% endif %}</p>
+                {% if entry.notes %}<p>{{ entry.notes[:220] }}{% if entry.notes|length > 220 %}...{% endif %}</p>{% endif %}
+            </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-state">No bibliography entries yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

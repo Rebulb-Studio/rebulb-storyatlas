@@ -1,0 +1,64 @@
+
+{% extends "base.html" %}
+{% block title %}Bibliography · LoreWiki Studio{% endblock %}
+{% block content %}
+<section class="section-head">
+    <div>
+        <h1>Bibliography</h1>
+        <p class="muted">Store books, papers, articles, websites, interviews, and any research feeding your project.</p>
+    </div>
+    <a class="button primary" href="{{ url_for('create_bibliography') }}">New source</a>
+</section>
+
+<section class="card">
+    <form class="filter-grid" method="get">
+        <div>
+            <label for="q">Keyword</label>
+            <input id="q" type="text" name="q" placeholder="author, title, publisher..." value="{{ q }}">
+        </div>
+        <div class="filter-actions">
+            <button type="submit">Search</button>
+            <a class="button subtle" href="{{ url_for('list_bibliography') }}">Reset</a>
+        </div>
+    </form>
+</section>
+
+<section class="card">
+    {% if entries %}
+        <div class="stack">
+            {% for entry in entries %}
+            <article class="list-card">
+                <div class="section-head tight">
+                    <div>
+                        <strong>{{ entry.title }}</strong>
+                        <p class="muted small">
+                            {{ entry.entry_type }}
+                            {% if entry.author %} · {{ entry.author }}{% endif %}
+                            {% if entry.year %} · {{ entry.year }}{% endif %}
+                            {% if entry.publisher %} · {{ entry.publisher }}{% endif %}
+                        </p>
+                    </div>
+                    <div class="row-actions">
+                        <a class="button subtle" href="{{ url_for('edit_bibliography', entry_id=entry.id) }}">Edit</a>
+                        <form method="post" action="{{ url_for('delete_bibliography', entry_id=entry.id) }}" onsubmit="return confirm('Delete this source?');">
+                            <button class="danger" type="submit">Delete</button>
+                        </form>
+                    </div>
+                </div>
+                {% if entry.notes %}
+                <p>{{ entry.notes }}</p>
+                {% endif %}
+                {% if entry.url %}
+                <p><a href="{{ entry.url }}" target="_blank" rel="noopener noreferrer">{{ entry.url }}</a></p>
+                {% endif %}
+                {% if entry.related_pages %}
+                <p class="muted small">Related pages: {{ entry.related_pages }}</p>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty-state">No sources yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == "edit" %}Edit Source{% else %}New Source{% endif %} · LoreWiki Studio{% endblock %}
+{% block content %}
+<section class="section-head">
+    <div>
+        <h1>{% if mode == "edit" %}Edit source{% else %}Create source{% endif %}</h1>
+        <p class="muted">Save research with guided note structures so every source tells you why it matters.</p>
+    </div>
+</section>
+
+<section class="card helper-card">
+    <div class="section-head tight">
+        <div>
+            <h2>Research note template</h2>
+            <p class="muted">Switch source type and auto-fill the notes area with a reusable structure.</p>
+        </div>
+        <button type="button" class="button" id="apply-source-template">Apply notes template</button>
+    </div>
+</section>
+
+<form class="card form-stack" method="post">
+    <div class="grid-3">
+        <div>
+            <label for="entry_type">Type</label>
+            <select id="entry_type" name="entry_type">
+                {% set entry_type = entry.entry_type if entry else 'book' %}
+                {% for item in biblio_types %}
+                <option value="{{ item }}" {% if entry_type == item %}selected{% endif %}>{{ item }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="author">Author</label>
+            <input id="author" name="author" value="{{ entry.author if entry else '' }}">
+        </div>
+        <div>
+            <label for="year">Year</label>
+            <input id="year" name="year" value="{{ entry.year if entry else '' }}">
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div>
+            <label for="title">Title</label>
+            <input id="title" name="title" required value="{{ entry.title if entry else '' }}">
+        </div>
+        <div>
+            <label for="publisher">Publisher / Source</label>
+            <input id="publisher" name="publisher" value="{{ entry.publisher if entry else '' }}">
+        </div>
+    </div>
+
+    <div>
+        <label for="url">URL</label>
+        <input id="url" name="url" placeholder="https://example.com" value="{{ entry.url if entry else '' }}">
+    </div>
+
+    <div>
+        <label for="related_pages">Related page slugs</label>
+        <input id="related_pages" name="related_pages" placeholder="capital-city, empire-history, main-antagonist" value="{{ entry.related_pages if entry else '' }}">
+    </div>
+
+    <div>
+        <label for="notes">Notes</label>
+        <textarea id="notes" name="notes" rows="14" placeholder="Why this source matters, what ideas it supports, contradictions, details to reuse, etc.">{{ entry.notes if entry else '' }}</textarea>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="primary">{% if mode == "edit" %}Save changes{% else %}Create source{% endif %}</button>
+        <a class="button subtle" href="{{ url_for('list_bibliography') }}">Cancel</a>
+    </div>
+</form>
+
+<script>
+const sourceTemplates = {{ bibliography_templates_json | safe }};
+const sourceType = document.getElementById('entry_type');
+const notesInput = document.getElementById('notes');
+const applySourceTemplateButton = document.getElementById('apply-source-template');
+
+function applySourceTemplate(force = false) {
+    const selected = sourceTemplates[sourceType.value] || sourceTemplates['other'];
+    if (force || !notesInput.value.trim()) {
+        notesInput.value = selected.notes || '';
+    }
+}
+
+applySourceTemplateButton.addEventListener('click', () => {
+    const overwrite = confirm('Apply the note template for this source type? Existing notes will be replaced.');
+    applySourceTemplate(overwrite);
+});
+
+sourceType.addEventListener('change', () => {
+    if (!notesInput.value.trim()) {
+        applySourceTemplate(false);
+    }
+});
+</script>
+{% endblock %}

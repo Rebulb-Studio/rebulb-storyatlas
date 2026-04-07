@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>StoryAtlas</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <div id="app-shell" class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-card" onclick="WF.navigate('dashboard')">
+        <div class="brand-mark">SA</div>
+        <div>
+          <div id="project-name-display" class="brand-title">StoryAtlas</div>
+          <div id="project-genre-display" class="brand-subtitle">Serial fiction studio for light novels, manga, comics, and novels</div>
+        </div>
+      </div>
+      <div id="main-nav" class="main-nav"></div>
+      <div class="sidebar-footer">
+        <button class="btn btn-secondary btn-block" onclick="WF.navigate('storyCanvas')">Story Canvas</button>
+        <button class="btn btn-secondary btn-block" onclick="WF.showSettings()">Project Settings</button>
+        <button class="btn btn-primary btn-block" onclick="WF.exportZIP()">Export ZIP</button>
+      </div>
+    </aside>
+
+    <main class="main-panel">
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="topbar-title">StoryAtlas</div>
+          <div class="topbar-subtitle">A smoother serial-story workspace for light novels, comics, manga, and novels</div>
+        </div>
+        <div class="topbar-right">
+          <div class="search-wrap">
+            <input id="global-search" class="search-input" type="text" placeholder="Search everything or type / for commands..." autocomplete="off" />
+            <div id="search-dropdown" class="search-dropdown hidden"></div>
+          </div>
+          <button id="notes-btn" class="btn btn-secondary" type="button">Notes</button>
+          <button id="help-btn" class="btn btn-secondary" type="button">Help</button>
+          <button id="theme-toggle" class="btn btn-secondary" type="button">◑ Dark</button>
+          <button id="command-btn" class="btn btn-primary" type="button">⌘ / Ctrl + K</button>
+        </div>
+      </header>
+
+      <section id="content-area" class="content-area"></section>
+    </main>
+  </div>
+
+  <div id="modal-overlay" class="modal-overlay hidden" onclick="WF.closeModalOnBg(event)">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div id="modal-title" class="modal-title">Modal</div>
+        <button class="icon-btn" onclick="WF.closeModal()">✕</button>
+      </div>
+      <div id="modal-body" class="modal-body"></div>
+      <div id="modal-footer" class="modal-footer"></div>
+    </div>
+  </div>
+
+  <div id="command-overlay" class="modal-overlay hidden" onclick="WF.closeCommandPaletteOnBg(event)">
+    <div class="modal-card command-card">
+      <div class="modal-header">
+        <div id="command-title" class="modal-title">Command Palette</div>
+        <button class="icon-btn" onclick="WF.closeCommandPalette()">✕</button>
+      </div>
+      <div class="modal-body command-body">
+        <input id="command-input" class="field-input" type="text" placeholder="Jump to a section, find a page, or create something new..." autocomplete="off">
+        <div id="command-results" class="command-results"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-stack" class="toast-stack"></div>
+  <input id="import-file-input" class="hidden" type="file" accept=".json,.zip,application/json,application/zip">
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+  <script src="{{ url_for('static', filename='enhanced.js') }}"></script>
+</body>
+</html>

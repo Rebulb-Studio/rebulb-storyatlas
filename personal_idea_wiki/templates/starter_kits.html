@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Starter Kits · LoreWiki Studio{% endblock %}
+{% block content %}
+<section class="section-head">
+    <div>
+        <h1>Starter kits</h1>
+        <p class="muted">Ready-made structures for lore pages, plotlines, and research notes.</p>
+    </div>
+</section>
+
+<section class="card">
+    <div class="section-head">
+        <div>
+            <div class="eyebrow">Pages</div>
+            <h2>Guided page types</h2>
+        </div>
+    </div>
+    <div class="starter-grid">
+        {% for key, template in page_templates.items() %}
+        <article class="starter-card">
+            <div class="section-head tight">
+                <h3>{{ key }}</h3>
+                <a class="button subtle" href="{{ url_for('create_page', type=key) }}">Use</a>
+            </div>
+            <p>{{ template.summary }}</p>
+            <details>
+                <summary>Infobox starter</summary>
+                <pre>{{ template.infobox }}</pre>
+            </details>
+            <details>
+                <summary>Article starter</summary>
+                <pre>{{ template.content }}</pre>
+            </details>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="card">
+    <div class="section-head">
+        <div>
+            <div class="eyebrow">Plotlines</div>
+            <h2>Arc structures</h2>
+        </div>
+    </div>
+    <div class="starter-grid two-up-grid">
+        {% for key, template in plotline_templates.items() %}
+        <article class="starter-card">
+            <div class="section-head tight">
+                <h3>{{ template.label }}</h3>
+                <a class="button subtle" href="{{ url_for('create_plotline', template=key) }}">Use</a>
+            </div>
+            <p>{{ template.summary }}</p>
+            <details>
+                <summary>Beat structure</summary>
+                <pre>{{ template.points }}</pre>
+            </details>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="card">
+    <div class="section-head">
+        <div>
+            <div class="eyebrow">Research</div>
+            <h2>Source note formats</h2>
+        </div>
+    </div>
+    <div class="starter-grid two-up-grid">
+        {% for key, template in bibliography_templates.items() %}
+        <article class="starter-card">
+            <div class="section-head tight">
+                <h3>{{ key }}</h3>
+                <a class="button subtle" href="{{ url_for('create_bibliography') }}">Use</a>
+            </div>
+            <pre>{{ template.notes }}</pre>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
