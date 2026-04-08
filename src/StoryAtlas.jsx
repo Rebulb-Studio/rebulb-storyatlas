@@ -406,7 +406,7 @@ export default function StoryAtlasWorkspace() {
       <div style={{ padding: "1.5rem" }}>
         {/* Project Header */}
         <div style={{ marginBottom: "2rem" }}>
-          <div style={{ fontSize: "0.7rem", color: t.accent, letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 700, marginBottom: "0.5rem" }}>{"StoryAtlas \u00B7 Creative Workspace"}</div>
+          <div style={{ fontSize: "0.7rem", color: t.accent, letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 700, marginBottom: "0.5rem" }}>{"Rebulb Studio \u00B7 Creative Workspace"}</div>
           <input value={projectMeta.projectName} onChange={e => doUpdateMeta({ projectName: e.target.value })} placeholder="Your Project Name"
             style={{ fontFamily: "'Playfair Display',serif", fontSize: "clamp(1.6rem,4vw,2.4rem)", background: "transparent", border: "none", color: t.textBright, width: "100%", outline: "none", padding: 0 }} />
           <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.75rem", flexWrap: "wrap" }}>
@@ -726,15 +726,18 @@ export default function StoryAtlasWorkspace() {
           <div style={{ background: t.surface, border: `1px solid ${t.border}`, borderRadius: "10px", padding: "1.25rem", marginBottom: "1.5rem" }}>
             <h3 style={{ fontWeight: 700, color: t.textBright, fontSize: "0.95rem", marginBottom: "0.75rem" }}>Words per Chapter</h3>
             <div style={{ display: "flex", alignItems: "flex-end", gap: "3px", height: "100px" }}>
-              {chapters.filter(c => c.wordCount).slice(0, 30).map((c, i) => {
-                const max = Math.max(...chapters.map(ch => parseInt(ch.wordCount) || 0));
-                const pct = max > 0 ? ((parseInt(c.wordCount) || 0) / max) * 100 : 0;
-                return (
-                  <div key={c.id || i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }} title={`${c.name || `Ch ${c.number || i + 1}`}: ${c.wordCount} words`}>
-                    <div style={{ width: "100%", height: `${pct}%`, minHeight: "2px", background: t.accent, borderRadius: "2px 2px 0 0" }} />
-                  </div>
-                );
-              })}
+              {(() => {
+                const withWc = chapters.filter(c => c.wordCount).slice(0, 30);
+                const max = Math.max(...withWc.map(ch => parseInt(ch.wordCount) || 0), 1);
+                return withWc.map((c, i) => {
+                  const pct = ((parseInt(c.wordCount) || 0) / max) * 100;
+                  return (
+                    <div key={c.id || i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }} title={`${c.name || `Ch ${c.number || i + 1}`}: ${c.wordCount} words`}>
+                      <div style={{ width: "100%", height: `${pct}%`, minHeight: "2px", background: t.accent, borderRadius: "2px 2px 0 0" }} />
+                    </div>
+                  );
+                });
+              })()}
             </div>
           </div>
         )}
@@ -877,7 +880,7 @@ export default function StoryAtlasWorkspace() {
   const renderOnboarding = () => {
     if (!showOnboarding) return null;
     const steps = [
-      { title: "Welcome to StoryAtlas", body: "Your creative worldbuilding workspace. Track characters, locations, magic systems, plot outlines, and more \u2014 all in one place." },
+      { title: "Welcome to Rebulb Studio", body: "Your creative worldbuilding workspace. Track characters, locations, magic systems, plot outlines, and more \u2014 all in one place." },
       { title: "Name Your Project", body: "Give your project a name to get started.", hasInput: true },
       { title: "You're All Set!", body: "Start creating entries, explore the workspace views, or press Ctrl+K for the command palette." },
     ];
@@ -912,14 +915,27 @@ export default function StoryAtlasWorkspace() {
         ::-webkit-scrollbar { width:5px; } ::-webkit-scrollbar-thumb { background:${t.accent}; border-radius:3px; }
         ::selection { background:${t.accent}30; }
         details > summary { list-style:none; } details > summary::-webkit-details-marker { display:none; }
-        textarea:focus, input:focus, select:focus { outline:none; border-color:${t.accent}80 !important; }
+        textarea:focus, input:focus, select:focus { outline:none; border-color:${t.accent}80 !important; box-shadow: 0 0 0 3px ${t.accent}20; }
+        select { -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.6rem center; padding-right: 2rem; }
+        @media (max-width: 768px) {
+          .studio-sidebar { position: fixed !important; left: 0; top: 0; z-index: 100; height: 100vh; box-shadow: 4px 0 20px rgba(0,0,0,0.5); }
+          .studio-sidebar.closed { transform: translateX(-100%); width: 0 !important; }
+          .studio-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+          .studio-main { width: 100% !important; }
+        }
+        @media (max-width: 480px) {
+          .studio-main { padding: 0.75rem !important; }
+        }
       `}</style>
 
+      {/* Mobile overlay */}
+      {sidebarOpen && <div className="studio-overlay" onClick={() => setSidebarOpen(false)} style={{ display: "none" }} />}
+
       {/* Sidebar */}
-      <div style={{
+      <div className={`studio-sidebar ${sidebarOpen ? "" : "closed"}`} style={{
         width: sidebarOpen ? "240px" : "50px", minHeight: "100vh",
         background: t.surface, borderRight: `1px solid ${t.border}`,
-        transition: "width 0.2s", flexShrink: 0, display: "flex", flexDirection: "column", overflow: "hidden",
+        transition: "width 0.25s ease, transform 0.25s ease", flexShrink: 0, display: "flex", flexDirection: "column", overflow: "hidden",
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <button onClick={() => setSidebarOpen(!sidebarOpen)}

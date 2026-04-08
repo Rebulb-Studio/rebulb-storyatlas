@@ -43,7 +43,7 @@ export function WorldBible({ data, projectMeta, onNavigate, theme: t }) {
   return (
     <div style={{ padding: "1.5rem" }}>
       <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: t.textBright, marginBottom: "0.5rem" }}>
-        {projectMeta.projectName || "StoryAtlas"} \u2014 World Bible
+        {projectMeta.projectName || "Rebulb Studio"} {"\u2014"} World Bible
       </h2>
       <p style={{ color: t.textMuted, fontSize: "0.85rem", marginBottom: "1.5rem" }}>
         {projectMeta.genre && `${projectMeta.genre} \u00B7 `}{estimateTotalWords(data, projectMeta.scratchpad).toLocaleString()} words estimated
