@@ -138,7 +138,7 @@ export function StoryCanvas({ data, projectMeta, onView, onUpdateMeta, theme: t 
                 {colNotes.map(note => (
                   <div key={note.id} style={{ background: "#fef08a18", border: "1px solid #fef08a30", borderRadius: "4px", padding: "0.5rem", fontSize: "0.78rem", color: "#fef08a", display: "flex", justifyContent: "space-between" }}>
                     <span>{note.text}</span>
-                    <button onClick={() => removeNote(note.id)} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: "0.7rem", padding: 0 }}>\u00D7</button>
+                    <button onClick={() => removeNote(note.id)} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: "0.7rem", padding: 0 }}>{"\u00D7"}</button>
                   </div>
                 ))}
               </div>
@@ -250,7 +250,7 @@ export function CanonGraph({ data, onView, theme: t }) {
             const from = nodeMap[e.from], to = nodeMap[e.to];
             return (
               <div key={i} style={{ fontSize: "0.75rem", color: t.textMuted, padding: "0.3rem 0.5rem", background: t.surface, borderRadius: "4px" }}>
-                <strong>{from?.label}</strong> \u2192 <strong>{to?.label}</strong> <span style={{ color: t.textDim }}>({e.label})</span>
+                <strong>{from?.label}</strong> {"\u2192"} <strong>{to?.label}</strong> <span style={{ color: t.textDim }}>({e.label})</span>
               </div>
             );
           })}

@@ -411,7 +411,7 @@ export const COLLECTION_DEFS = {
   },
 };
 
-export const NAV_GROUPS = ["WIKI","WORLDBUILDING","STORY","CREATIVE","WRITING","REFERENCE","WORKSPACE"];
+export const NAV_GROUPS = ["WIKI","WORLDBUILDING","STORY","CREATIVE","WRITING","REFERENCE","PUBLISH","WORKSPACE"];
 
 // ─── Workspace Sections ───────────────────────────────────────────────
 export const WORKSPACE_SECTIONS = {
@@ -486,6 +486,29 @@ export const STARTER_KITS = {
     { label: "Secret Society", values: { type: "Secret Society", status: "Covert" }},
     { label: "Military Order", values: { type: "Military", status: "Active" }},
   ],
+};
+
+// ─── Publish Sections ────────────────────────────────────────────────
+export const PUBLISH_SECTIONS = {
+  seriesListing: { label: "Series Listing", icon: "\u{1F4FA}", color: "#ec4899", group: "PUBLISH" },
+  readerMode: { label: "Reader Mode", icon: "\u{1F4D6}", color: "#8b5cf6", group: "PUBLISH" },
+  seriesDashboard: { label: "Series Dashboard", icon: "\u{1F4CA}", color: "#3b82f6", group: "PUBLISH" },
+  pitchBible: { label: "Pitch Bible", icon: "\u{1F4CB}", color: "#f59e0b", group: "PUBLISH" },
+};
+
+export const SERIES_FORMATS = ["Manga", "Webtoon", "Light Novel", "Web Serial", "Graphic Novel", "Screenplay", "Animated Series", "Short Film"];
+export const SERIES_STATUSES = ["Planned", "Ongoing", "Hiatus", "Complete"];
+
+export const READER_THEMES = {
+  dark: { bg: "#0a0a14", text: "#d4d4d8", name: "Dark" },
+  light: { bg: "#fefce8", text: "#1c1917", name: "Light" },
+  sepia: { bg: "#f5f0e8", text: "#44403c", name: "Sepia" },
+};
+
+export const READER_FONTS = {
+  serif: { family: "'Playfair Display', Georgia, serif", label: "Serif" },
+  sans: { family: "'DM Sans', system-ui, sans-serif", label: "Sans" },
+  mono: { family: "'JetBrains Mono', monospace", label: "Mono" },
 };
 
 // ─── Theme Palettes ───────────────────────────────────────────────────

@@ -52,8 +52,8 @@ export default function CommandPalette({ commands, onClose, theme }) {
           ))}
         </div>
         <div style={{ padding:"0.5rem 1.2rem", borderTop:`1px solid ${t.border}`, display:"flex", gap:"1rem", fontSize:"0.65rem", color:t.textDim }}>
-          <span>\u2191\u2193 navigate</span>
-          <span>\u21B5 select</span>
+          <span>{"\u2191\u2193"} navigate</span>
+          <span>{"\u21B5"} select</span>
           <span>esc close</span>
         </div>
       </div>

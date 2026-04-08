@@ -5,6 +5,7 @@ import { WorldBible, StoryCanvas, CanonGraph, ProjectStats, AtlasMap, Scratchpad
 import {
   COLLECTION_DEFS, FORMAT_PRESETS, OUTLINE_METHODS, NAV_GROUPS, WORKSPACE_SECTIONS,
   FIELD_HELP, WRITING_PROMPTS, STARTER_KITS, DARK_THEME, LIGHT_THEME,
+  PUBLISH_SECTIONS, SERIES_FORMATS, SERIES_STATUSES, READER_THEMES, READER_FONTS,
 } from "./constants.js";
 
 // ─── Component ─────────────────────────────────────────────────────────
@@ -239,7 +240,7 @@ export default function StoryAtlasWorkspace() {
           <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.4rem", color: t.textBright, margin: 0 }}>
             {isEdit ? `Edit ${cfg.label.replace(/s$/, "")}` : `New ${cfg.label.replace(/s$/, "")}`}
           </h2>
-          <button onClick={() => { setEditing(null); setViewing(null); }} style={pillBtn("#475569")}>\u2190 Back</button>
+          <button onClick={() => { setEditing(null); setViewing(null); }} style={pillBtn("#475569")}>{"\u2190"} Back</button>
         </div>
         {!isEdit && kits && kits.length > 0 && (
           <div style={{ marginBottom: "1rem" }}>
@@ -289,7 +290,7 @@ export default function StoryAtlasWorkspace() {
           <div style={{ display: "flex", gap: "0.5rem" }}>
             <button onClick={() => { setViewing(null); setEditing({ collection, item }); }} style={pillBtn(cfg.color)}>Edit</button>
             <button onClick={() => deleteEntry(collection, item.id)} style={pillBtn("#ef4444")}>Delete</button>
-            <button onClick={() => setViewing(null)} style={pillBtn("#475569")}>\u2190 Back</button>
+            <button onClick={() => setViewing(null)} style={pillBtn("#475569")}>{"\u2190"} Back</button>
           </div>
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem", marginBottom: "1.5rem" }}>
@@ -384,7 +385,7 @@ export default function StoryAtlasWorkspace() {
                       <div style={{ height: "100%", width: `${comp}%`, background: comp > 60 ? t.success : comp > 30 ? "#f59e0b" : t.danger, borderRadius: "2px" }} />
                     </div>
                     <span style={{ color: t.textDim, fontSize: "0.65rem" }}>{comp}%</span>
-                    <span style={{ color: t.textDim, fontSize: "0.9rem" }}>\u2192</span>
+                    <span style={{ color: t.textDim, fontSize: "0.9rem" }}>{"\u2192"}</span>
                   </div>
                 </button>
               );
@@ -405,7 +406,7 @@ export default function StoryAtlasWorkspace() {
       <div style={{ padding: "1.5rem" }}>
         {/* Project Header */}
         <div style={{ marginBottom: "2rem" }}>
-          <div style={{ fontSize: "0.7rem", color: t.accent, letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 700, marginBottom: "0.5rem" }}>StoryAtlas \u00B7 Creative Workspace</div>
+          <div style={{ fontSize: "0.7rem", color: t.accent, letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 700, marginBottom: "0.5rem" }}>{"StoryAtlas \u00B7 Creative Workspace"}</div>
           <input value={projectMeta.projectName} onChange={e => doUpdateMeta({ projectName: e.target.value })} placeholder="Your Project Name"
             style={{ fontFamily: "'Playfair Display',serif", fontSize: "clamp(1.6rem,4vw,2.4rem)", background: "transparent", border: "none", color: t.textBright, width: "100%", outline: "none", padding: 0 }} />
           <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.75rem", flexWrap: "wrap" }}>
@@ -430,13 +431,17 @@ export default function StoryAtlasWorkspace() {
           })}
         </div>
 
-        {/* Writing Prompt */}
-        <div style={{ background: `linear-gradient(135deg, ${t.accent}10, ${t.info}08)`, border: `1px solid ${t.accent}25`, borderRadius: "10px", padding: "1rem", marginBottom: "1.5rem" }}>
-          <div style={{ fontSize: "0.7rem", color: t.accent, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "0.4rem" }}>Writing Prompt</div>
-          <div style={{ fontSize: "0.88rem", color: t.text, lineHeight: 1.6, marginBottom: "0.5rem" }}>{prompt}</div>
-          <div style={{ display: "flex", gap: "0.4rem" }}>
+        {/* Writing Prompt — Expanded */}
+        <div style={{ background: `linear-gradient(135deg, ${t.accent}12, ${t.info}08)`, border: `2px solid ${t.accent}30`, borderRadius: "12px", padding: "1.5rem", marginBottom: "1.5rem" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
+            <div style={{ fontSize: "0.72rem", color: t.accent, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.12em" }}>{"\u270E"} Writing Prompt</div>
+            <div style={{ fontSize: "0.68rem", color: t.textDim }}>Prompt {(promptIndex % WRITING_PROMPTS.length) + 1} of {WRITING_PROMPTS.length}</div>
+          </div>
+          <div style={{ fontSize: "1rem", color: t.textBright, lineHeight: 1.7, marginBottom: "1rem", fontFamily: "'Playfair Display',serif", fontStyle: "italic" }}>{prompt}</div>
+          <div style={{ display: "flex", gap: "0.4rem", flexWrap: "wrap" }}>
             <button onClick={() => setPromptIndex(i => i + 1)} style={pillBtn(t.accent)}>Next Prompt</button>
-            <button onClick={() => { setScratchpadText(prev => prev + (prev ? "\n\n" : "") + prompt); setSection("scratchpad"); }} style={pillBtn(t.success)}>Capture to Scratchpad</button>
+            <button onClick={() => { setScratchpadText(prev => prev + (prev ? "\n\n" : "") + prompt); toast("Prompt captured", "success"); }} style={pillBtn(t.info)}>Capture</button>
+            <button onClick={() => { setScratchpadText(prev => prev + (prev ? "\n\n---\n\n" : "") + `PROMPT: ${prompt}\n\n`); setSection("scratchpad"); }} style={pillBtn(t.success)}>Write Now</button>
           </div>
         </div>
 
@@ -478,7 +483,7 @@ export default function StoryAtlasWorkspace() {
             {OUTLINE_METHODS.map(m => (
               <details key={m.id} style={{ background: t.surface, border: `1px solid ${t.border}`, borderRadius: "6px", padding: "0.6rem 0.75rem" }}>
                 <summary style={{ cursor: "pointer", fontWeight: 600, color: t.text, fontSize: "0.85rem" }}>
-                  {m.label} <span style={{ color: t.textDim, fontWeight: 400 }}>\u2014 {m.desc}</span>
+                  {m.label} <span style={{ color: t.textDim, fontWeight: 400 }}>{"\u2014"} {m.desc}</span>
                 </summary>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "0.3rem", marginTop: "0.5rem" }}>
                   {m.beats.map((b, i) => (
@@ -523,6 +528,332 @@ export default function StoryAtlasWorkspace() {
     );
   };
 
+  // ─── Publish: Series Listing ─────────────────────────────────────
+  const renderSeriesListing = () => {
+    const series = projectMeta.series || [];
+    const [editingSeries, setEditingSeries] = useState(null);
+    const [seriesForm, setSeriesForm] = useState({ title: "", genre: "", format: "Manga", status: "Planned", synopsis: "", targetAudience: "", chapterCount: "", tags: "", coverConcept: "" });
+
+    const saveSeries = async () => {
+      const updated = editingSeries !== null
+        ? series.map((s, i) => i === editingSeries ? seriesForm : s)
+        : [...series, { ...seriesForm, id: Date.now().toString(36), createdAt: new Date().toISOString() }];
+      await doUpdateMeta({ series: updated });
+      setEditingSeries(null);
+      setSeriesForm({ title: "", genre: "", format: "Manga", status: "Planned", synopsis: "", targetAudience: "", chapterCount: "", tags: "", coverConcept: "" });
+      toast("Series saved", "success");
+    };
+
+    const deleteSeries = async (idx) => {
+      const updated = series.filter((_, i) => i !== idx);
+      await doUpdateMeta({ series: updated });
+      toast("Series deleted", "info");
+    };
+
+    return (
+      <div style={{ padding: "1.5rem" }}>
+        <div style={{ fontSize: "0.7rem", color: t.accent, letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 700, marginBottom: "0.5rem" }}>{"Publish \u00B7 Series Listing"}</div>
+        <h2 style={{ fontFamily: "'Playfair Display',serif", color: t.textBright, marginBottom: "1rem", fontSize: "1.5rem" }}>Your Series</h2>
+
+        {/* Series Cards */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "1rem", marginBottom: "1.5rem" }}>
+          {series.map((s, i) => (
+            <div key={s.id || i} style={{ background: t.surface, border: `1px solid ${t.border}`, borderRadius: "10px", padding: "1.25rem" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.5rem" }}>
+                <h3 style={{ fontFamily: "'Playfair Display',serif", color: t.textBright, fontSize: "1.1rem" }}>{s.title || "Untitled"}</h3>
+                <span style={{ background: s.status === "Ongoing" ? t.success + "20" : s.status === "Complete" ? t.info + "20" : t.accent + "15", color: s.status === "Ongoing" ? t.success : s.status === "Complete" ? t.info : t.accent, fontSize: "0.65rem", padding: "2px 8px", borderRadius: "10px", fontWeight: 600 }}>{s.status}</span>
+              </div>
+              <div style={{ display: "flex", gap: "0.3rem", flexWrap: "wrap", marginBottom: "0.5rem" }}>
+                {s.format && <span style={{ fontSize: "0.65rem", background: t.accentDim, color: t.accent, padding: "2px 6px", borderRadius: "4px" }}>{s.format}</span>}
+                {s.genre && <span style={{ fontSize: "0.65rem", background: t.accentDim, color: t.accent, padding: "2px 6px", borderRadius: "4px" }}>{s.genre}</span>}
+              </div>
+              {s.synopsis && <p style={{ fontSize: "0.82rem", color: t.textMuted, lineHeight: 1.5, marginBottom: "0.5rem" }}>{s.synopsis.slice(0, 150)}{s.synopsis.length > 150 ? "..." : ""}</p>}
+              {s.chapterCount && <div style={{ fontSize: "0.72rem", color: t.textDim }}>{s.chapterCount} chapters planned</div>}
+              <div style={{ display: "flex", gap: "0.3rem", marginTop: "0.75rem" }}>
+                <button onClick={() => { setEditingSeries(i); setSeriesForm(s); }} style={pillBtn(t.accent)}>Edit</button>
+                <button onClick={() => deleteSeries(i)} style={pillBtn(t.danger)}>Delete</button>
+              </div>
+            </div>
+          ))}
+
+          {/* New Series Button */}
+          <button onClick={() => { setEditingSeries(-1); setSeriesForm({ title: "", genre: projectMeta.genre || "", format: "Manga", status: "Planned", synopsis: "", targetAudience: "", chapterCount: "", tags: "", coverConcept: "" }); }}
+            style={{ background: t.surface, border: `2px dashed ${t.border}`, borderRadius: "10px", padding: "2rem", cursor: "pointer", color: t.textDim, fontFamily: "inherit", fontSize: "0.9rem", textAlign: "center" }}>
+            + Create New Series
+          </button>
+        </div>
+
+        {/* Edit Form */}
+        {editingSeries !== null && (
+          <div style={{ background: t.surface, border: `1px solid ${t.accent}40`, borderRadius: "10px", padding: "1.5rem", marginBottom: "1.5rem" }}>
+            <h3 style={{ color: t.textBright, marginBottom: "1rem" }}>{editingSeries === -1 ? "New Series" : "Edit Series"}</h3>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+              <div><label style={{ display: "block", fontSize: "0.7rem", color: t.accent, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.3rem" }}>Title</label><input value={seriesForm.title} onChange={e => setSeriesForm(p => ({ ...p, title: e.target.value }))} style={inputStyle} /></div>
+              <div><label style={{ display: "block", fontSize: "0.7rem", color: t.accent, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.3rem" }}>Genre</label><input value={seriesForm.genre} onChange={e => setSeriesForm(p => ({ ...p, genre: e.target.value }))} style={inputStyle} /></div>
+              <div><label style={{ display: "block", fontSize: "0.7rem", color: t.accent, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.3rem" }}>Format</label><select value={seriesForm.format} onChange={e => setSeriesForm(p => ({ ...p, format: e.target.value }))} style={inputStyle}>{SERIES_FORMATS.map(f => <option key={f} value={f}>{f}</option>)}</select></div>
+              <div><label style={{ display: "block", fontSize: "0.7rem", color: t.accent, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.3rem" }}>Status</label><select value={seriesForm.status} onChange={e => setSeriesForm(p => ({ ...p, status: e.target.value }))} style={inputStyle}>{SERIES_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}</select></div>
+              <div><label style={{ display: "block", fontSize: "0.7rem", color: t.accent, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.3rem" }}>Target Audience</label><input value={seriesForm.targetAudience} onChange={e => setSeriesForm(p => ({ ...p, targetAudience: e.target.value }))} style={inputStyle} placeholder="Teens, Young Adult, All Ages..." /></div>
+              <div><label style={{ display: "block", fontSize: "0.7rem", color: t.accent, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.3rem" }}>Chapter Count</label><input type="number" value={seriesForm.chapterCount} onChange={e => setSeriesForm(p => ({ ...p, chapterCount: e.target.value }))} style={inputStyle} /></div>
+            </div>
+            <div style={{ marginTop: "0.75rem" }}><label style={{ display: "block", fontSize: "0.7rem", color: t.accent, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.3rem" }}>Synopsis</label><textarea value={seriesForm.synopsis} onChange={e => setSeriesForm(p => ({ ...p, synopsis: e.target.value }))} rows={3} style={{ ...inputStyle, resize: "vertical" }} /></div>
+            <div style={{ marginTop: "0.75rem" }}><label style={{ display: "block", fontSize: "0.7rem", color: t.accent, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "0.3rem" }}>Tags</label><input value={seriesForm.tags} onChange={e => setSeriesForm(p => ({ ...p, tags: e.target.value }))} style={inputStyle} placeholder="Comma-separated tags" /></div>
+            <div style={{ display: "flex", gap: "0.5rem", marginTop: "1rem" }}>
+              <button onClick={saveSeries} style={pillBtn(t.accent)}>Save Series</button>
+              <button onClick={() => setEditingSeries(null)} style={pillBtn(t.textDim)}>Cancel</button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // ─── Publish: Reader Mode ──────────────────────────────────────
+  const renderReaderMode = () => {
+    const manuscripts = data.manuscripts || [];
+    const [selectedMs, setSelectedMs] = useState(null);
+    const [readerTheme, setReaderTheme] = useState("dark");
+    const [readerFont, setReaderFont] = useState("serif");
+    const [fontSize, setFontSize] = useState(18);
+    const [lineHeight, setLineHeight] = useState(1.8);
+
+    const current = manuscripts.find(m => m.id === selectedMs);
+    const rTheme = READER_THEMES[readerTheme];
+    const rFont = READER_FONTS[readerFont];
+    const wordCount = current?.content ? current.content.split(/\s+/).filter(Boolean).length : 0;
+    const readTime = Math.ceil(wordCount / 250);
+
+    return (
+      <div style={{ padding: "1.5rem" }}>
+        <div style={{ fontSize: "0.7rem", color: t.accent, letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 700, marginBottom: "0.5rem" }}>{"Publish \u00B7 Reader Mode"}</div>
+        <h2 style={{ fontFamily: "'Playfair Display',serif", color: t.textBright, marginBottom: "1rem", fontSize: "1.5rem" }}>Reader Mode</h2>
+
+        {/* Manuscript selector */}
+        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap" }}>
+          <select value={selectedMs || ""} onChange={e => setSelectedMs(e.target.value || null)} style={{ ...inputStyle, width: "280px" }}>
+            <option value="">{"\u2014 Select Manuscript \u2014"}</option>
+            {manuscripts.map(m => <option key={m.id} value={m.id}>{m.title || "Untitled"}</option>)}
+          </select>
+          {/* Reader controls */}
+          <select value={readerTheme} onChange={e => setReaderTheme(e.target.value)} style={{ ...inputStyle, width: "100px" }}>
+            {Object.entries(READER_THEMES).map(([k, v]) => <option key={k} value={k}>{v.name}</option>)}
+          </select>
+          <select value={readerFont} onChange={e => setReaderFont(e.target.value)} style={{ ...inputStyle, width: "100px" }}>
+            {Object.entries(READER_FONTS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+          </select>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.3rem", fontSize: "0.75rem", color: t.textDim }}>
+            <span>A</span>
+            <input type="range" min={14} max={24} value={fontSize} onChange={e => setFontSize(+e.target.value)} style={{ width: "80px" }} />
+            <span style={{ fontSize: "1.1rem" }}>A</span>
+          </div>
+        </div>
+
+        {!current ? (
+          <div style={{ textAlign: "center", padding: "4rem 2rem", color: t.textDim }}>
+            <div style={{ fontSize: "3rem", opacity: 0.3, marginBottom: "1rem" }}>{"\u{1F4D6}"}</div>
+            <h3 style={{ color: t.textMuted, marginBottom: "0.5rem" }}>Select a manuscript to read</h3>
+            <p style={{ fontSize: "0.85rem" }}>Create manuscripts in the Writing section, then read them here with custom formatting.</p>
+          </div>
+        ) : (
+          <div style={{ background: rTheme.bg, color: rTheme.text, borderRadius: "12px", padding: "3rem", maxWidth: "720px", margin: "0 auto", minHeight: "60vh", transition: "all 0.3s", boxShadow: "0 4px 30px rgba(0,0,0,0.3)" }}>
+            {/* Header */}
+            <div style={{ textAlign: "center", marginBottom: "2rem", paddingBottom: "1.5rem", borderBottom: `1px solid ${rTheme.text}15` }}>
+              <h1 style={{ fontFamily: rFont.family, fontSize: `${fontSize + 8}px`, marginBottom: "0.5rem" }}>{current.title || "Untitled"}</h1>
+              {current.pov && <div style={{ fontSize: "0.8rem", opacity: 0.5 }}>POV: {current.pov}</div>}
+              <div style={{ fontSize: "0.75rem", opacity: 0.4, marginTop: "0.5rem" }}>{wordCount.toLocaleString()} words {"\u00B7"} ~{readTime} min read</div>
+            </div>
+            {/* Content */}
+            <div style={{ fontFamily: rFont.family, fontSize: `${fontSize}px`, lineHeight, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+              {current.content || "No content yet. Write your manuscript in the Writing section."}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // ─── Publish: Series Dashboard ─────────────────────────────────
+  const renderSeriesDashboard = () => {
+    const series = projectMeta.series || [];
+    const chapters = data.chapters || [];
+    const manuscripts = data.manuscripts || [];
+    const totalChapters = chapters.length;
+    const totalManuscripts = manuscripts.length;
+    const totalWords = estimateTotalWords(data, scratchpadText);
+
+    const chaptersByStatus = {};
+    chapters.forEach(c => {
+      const s = c.status || "Unknown";
+      chaptersByStatus[s] = (chaptersByStatus[s] || 0) + 1;
+    });
+
+    return (
+      <div style={{ padding: "1.5rem" }}>
+        <div style={{ fontSize: "0.7rem", color: t.accent, letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 700, marginBottom: "0.5rem" }}>{"Publish \u00B7 Series Dashboard"}</div>
+        <h2 style={{ fontFamily: "'Playfair Display',serif", color: t.textBright, marginBottom: "1rem", fontSize: "1.5rem" }}>Production Overview</h2>
+
+        {/* Stats */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "0.75rem", marginBottom: "1.5rem" }}>
+          {[
+            { label: "Series", value: series.length, color: t.accent },
+            { label: "Chapters", value: totalChapters, color: t.info },
+            { label: "Manuscripts", value: totalManuscripts, color: t.success },
+            { label: "Total Words", value: totalWords.toLocaleString(), color: "#f59e0b" },
+          ].map(s => (
+            <div key={s.label} style={{ background: t.surface, border: `1px solid ${t.border}`, borderRadius: "10px", padding: "1rem", textAlign: "center" }}>
+              <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.4rem", color: s.color, fontWeight: 700 }}>{s.value}</div>
+              <div style={{ fontSize: "0.72rem", color: t.textDim, marginTop: "0.2rem" }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Chapter Status Breakdown */}
+        {totalChapters > 0 && (
+          <div style={{ background: t.surface, border: `1px solid ${t.border}`, borderRadius: "10px", padding: "1.25rem", marginBottom: "1.5rem" }}>
+            <h3 style={{ fontWeight: 700, color: t.textBright, fontSize: "0.95rem", marginBottom: "0.75rem" }}>Chapter Status</h3>
+            <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+              {Object.entries(chaptersByStatus).map(([status, count]) => (
+                <div key={status} style={{ background: t.accentDim, border: `1px solid ${t.accent}20`, borderRadius: "6px", padding: "0.5rem 0.75rem" }}>
+                  <div style={{ fontSize: "1.1rem", fontWeight: 700, color: t.accent }}>{count}</div>
+                  <div style={{ fontSize: "0.68rem", color: t.textDim }}>{status}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Word Count per Chapter */}
+        {chapters.filter(c => c.wordCount).length > 0 && (
+          <div style={{ background: t.surface, border: `1px solid ${t.border}`, borderRadius: "10px", padding: "1.25rem", marginBottom: "1.5rem" }}>
+            <h3 style={{ fontWeight: 700, color: t.textBright, fontSize: "0.95rem", marginBottom: "0.75rem" }}>Words per Chapter</h3>
+            <div style={{ display: "flex", alignItems: "flex-end", gap: "3px", height: "100px" }}>
+              {chapters.filter(c => c.wordCount).slice(0, 30).map((c, i) => {
+                const max = Math.max(...chapters.map(ch => parseInt(ch.wordCount) || 0));
+                const pct = max > 0 ? ((parseInt(c.wordCount) || 0) / max) * 100 : 0;
+                return (
+                  <div key={c.id || i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }} title={`${c.name || `Ch ${c.number || i + 1}`}: ${c.wordCount} words`}>
+                    <div style={{ width: "100%", height: `${pct}%`, minHeight: "2px", background: t.accent, borderRadius: "2px 2px 0 0" }} />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Audience Analytics placeholder */}
+        <div style={{ background: `linear-gradient(135deg, ${t.accent}08, ${t.info}05)`, border: `1px dashed ${t.accent}30`, borderRadius: "10px", padding: "2rem", textAlign: "center" }}>
+          <div style={{ fontSize: "1.5rem", opacity: 0.4, marginBottom: "0.5rem" }}>{"\u{1F4CA}"}</div>
+          <h3 style={{ color: t.textMuted, fontSize: "0.95rem", marginBottom: "0.3rem" }}>Audience Analytics</h3>
+          <p style={{ fontSize: "0.82rem", color: t.textDim }}>Coming soon {"\u2014"} connect to audience tracking when you publish on Rebulb.</p>
+        </div>
+      </div>
+    );
+  };
+
+  // ─── Publish: Pitch Bible ──────────────────────────────────────
+  const renderPitchBible = () => {
+    const characters = data.characters || [];
+    const locations = data.locations || [];
+    const plots = data.plots || [];
+    const lore = data.lore || [];
+    const bibliography = data.bibliography || [];
+    const formatInfo = FORMAT_PRESETS[projectMeta.format] || FORMAT_PRESETS.novel;
+
+    const generateMarkdown = () => {
+      let md = `# ${projectMeta.projectName || "Untitled Project"}\n`;
+      md += `**Author:** ${projectMeta.author || "Unknown"}\n`;
+      md += `**Genre:** ${projectMeta.genre || "Unspecified"}\n`;
+      md += `**Format:** ${formatInfo.label}\n\n`;
+      if (projectMeta.description) md += `## Logline\n${projectMeta.description}\n\n`;
+      if (lore.length) { md += `## World Overview\n`; lore.forEach(l => { md += `### ${l.name}\n${(l.overview || "").slice(0, 300)}\n\n`; }); }
+      if (characters.length) { md += `## Characters\n`; characters.forEach(c => { md += `### ${c.name}\n- **Role:** ${c.role || "N/A"}\n- **Archetype:** ${c.archetype || "N/A"}\n- **Arc:** ${(c.arcSummary || "").slice(0, 200)}\n\n`; }); }
+      if (locations.length) { md += `## Locations\n`; locations.forEach(l => { md += `### ${l.name}\n- **Type:** ${l.type || "N/A"}\n- **Region:** ${l.region || "N/A"}\n- **Overview:** ${(l.overview || "").slice(0, 200)}\n\n`; }); }
+      if (plots.length) { md += `## Plot Arcs\n`; plots.forEach(p => { md += `### ${p.name}\n- **Method:** ${p.method || "N/A"}\n- **Synopsis:** ${(p.synopsis || "").slice(0, 300)}\n\n`; }); }
+      if (bibliography.length) { md += `## Comparable Titles\n`; bibliography.forEach(b => { md += `- **${b.name}** (${b.type || "N/A"}) \u2014 ${b.influence || ""}\n`; }); md += "\n"; }
+      md += `## Format Specification\n- **Format:** ${formatInfo.label}\n- **Chapter Length:** ${formatInfo.chapterWords}\n- **Structure:** ${formatInfo.volumeChapters}\n- **POV:** ${formatInfo.pov}\n- **Notes:** ${formatInfo.notes}\n`;
+      return md;
+    };
+
+    const generateHTML = () => {
+      const md = generateMarkdown();
+      const lines = md.split("\n");
+      let html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${projectMeta.projectName || "Pitch Bible"}</title><style>body{font-family:'Georgia',serif;max-width:720px;margin:2rem auto;padding:0 1.5rem;color:#1a1a1a;line-height:1.7}h1{font-size:2rem;border-bottom:2px solid #8b5cf6;padding-bottom:0.5rem}h2{color:#8b5cf6;margin-top:2rem;border-bottom:1px solid #e5e7eb;padding-bottom:0.3rem}h3{color:#374151;margin-top:1rem}ul{padding-left:1.5rem}li{margin:0.3rem 0}</style></head><body>`;
+      lines.forEach(line => {
+        if (line.startsWith("# ")) html += `<h1>${line.slice(2)}</h1>`;
+        else if (line.startsWith("## ")) html += `<h2>${line.slice(3)}</h2>`;
+        else if (line.startsWith("### ")) html += `<h3>${line.slice(4)}</h3>`;
+        else if (line.startsWith("- ")) html += `<li>${line.slice(2)}</li>`;
+        else if (line.startsWith("**")) html += `<p>${line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")}</p>`;
+        else if (line.trim()) html += `<p>${line}</p>`;
+      });
+      html += "</body></html>";
+      return html;
+    };
+
+    const exportHTML = () => {
+      const html = generateHTML();
+      const blob = new Blob([html], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = `${(projectMeta.projectName || "pitch_bible").replace(/\s+/g, "_")}_PitchBible.html`;
+      a.click(); setTimeout(() => URL.revokeObjectURL(url), 100);
+      toast("Pitch Bible exported as HTML", "success");
+    };
+
+    const copyMarkdown = async () => {
+      try { await navigator.clipboard.writeText(generateMarkdown()); toast("Copied to clipboard", "success"); }
+      catch { toast("Copy failed", "error"); }
+    };
+
+    return (
+      <div style={{ padding: "1.5rem" }}>
+        <div style={{ fontSize: "0.7rem", color: t.accent, letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 700, marginBottom: "0.5rem" }}>{"Publish \u00B7 Pitch Bible"}</div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1rem", flexWrap: "wrap", gap: "0.75rem" }}>
+          <h2 style={{ fontFamily: "'Playfair Display',serif", color: t.textBright, fontSize: "1.5rem" }}>Pitch Bible</h2>
+          <div style={{ display: "flex", gap: "0.4rem" }}>
+            <button onClick={exportHTML} style={pillBtn(t.accent)}>Export HTML</button>
+            <button onClick={copyMarkdown} style={pillBtn(t.info)}>Copy Markdown</button>
+          </div>
+        </div>
+
+        {/* Live Preview */}
+        <div style={{ background: "#fefefe", color: "#1a1a1a", borderRadius: "12px", padding: "2.5rem", maxWidth: "720px", boxShadow: "0 4px 30px rgba(0,0,0,0.15)", fontFamily: "Georgia, serif", lineHeight: 1.7 }}>
+          <h1 style={{ fontSize: "2rem", borderBottom: "2px solid #8b5cf6", paddingBottom: "0.5rem", marginBottom: "1rem" }}>{projectMeta.projectName || "Untitled Project"}</h1>
+          <p><strong>Author:</strong> {projectMeta.author || "Unknown"} &nbsp;|&nbsp; <strong>Genre:</strong> {projectMeta.genre || "Unspecified"} &nbsp;|&nbsp; <strong>Format:</strong> {formatInfo.label}</p>
+          {projectMeta.description && <><h2 style={{ color: "#8b5cf6", borderBottom: "1px solid #e5e7eb", paddingBottom: "0.3rem", marginTop: "1.5rem" }}>Logline</h2><p>{projectMeta.description}</p></>}
+
+          {lore.length > 0 && <>
+            <h2 style={{ color: "#8b5cf6", borderBottom: "1px solid #e5e7eb", paddingBottom: "0.3rem", marginTop: "1.5rem" }}>World Overview</h2>
+            {lore.slice(0, 5).map(l => <div key={l.id}><h3>{l.name}</h3><p>{(l.overview || "").slice(0, 300)}</p></div>)}
+          </>}
+
+          {characters.length > 0 && <>
+            <h2 style={{ color: "#8b5cf6", borderBottom: "1px solid #e5e7eb", paddingBottom: "0.3rem", marginTop: "1.5rem" }}>Characters ({characters.length})</h2>
+            {characters.slice(0, 8).map(c => <div key={c.id} style={{ marginBottom: "0.75rem" }}><h3>{c.name}</h3><p><strong>Role:</strong> {c.role || "N/A"} &middot; <strong>Archetype:</strong> {c.archetype || "N/A"}</p>{c.arcSummary && <p style={{ fontSize: "0.9rem", color: "#6b7280" }}>{c.arcSummary.slice(0, 200)}</p>}</div>)}
+          </>}
+
+          {locations.length > 0 && <>
+            <h2 style={{ color: "#8b5cf6", borderBottom: "1px solid #e5e7eb", paddingBottom: "0.3rem", marginTop: "1.5rem" }}>Locations ({locations.length})</h2>
+            {locations.slice(0, 6).map(l => <div key={l.id}><h3>{l.name}</h3><p>{l.type || ""} {l.region ? `in ${l.region}` : ""} {"\u2014"} {(l.overview || "").slice(0, 200)}</p></div>)}
+          </>}
+
+          {plots.length > 0 && <>
+            <h2 style={{ color: "#8b5cf6", borderBottom: "1px solid #e5e7eb", paddingBottom: "0.3rem", marginTop: "1.5rem" }}>Plot Arcs ({plots.length})</h2>
+            {plots.slice(0, 5).map(p => <div key={p.id}><h3>{p.name}</h3><p>{(p.synopsis || "").slice(0, 300)}</p></div>)}
+          </>}
+
+          {bibliography.length > 0 && <>
+            <h2 style={{ color: "#8b5cf6", borderBottom: "1px solid #e5e7eb", paddingBottom: "0.3rem", marginTop: "1.5rem" }}>Comparable Titles</h2>
+            <ul>{bibliography.slice(0, 6).map(b => <li key={b.id}><strong>{b.name}</strong> ({b.type || "N/A"}) {"\u2014"} {b.influence || ""}</li>)}</ul>
+          </>}
+
+          <h2 style={{ color: "#8b5cf6", borderBottom: "1px solid #e5e7eb", paddingBottom: "0.3rem", marginTop: "1.5rem" }}>Format Specification</h2>
+          <p><strong>Format:</strong> {formatInfo.label} &middot; <strong>Chapter Length:</strong> {formatInfo.chapterWords} &middot; <strong>Structure:</strong> {formatInfo.volumeChapters}</p>
+          <p style={{ fontSize: "0.85rem", color: "#6b7280" }}>{formatInfo.notes}</p>
+        </div>
+      </div>
+    );
+  };
+
   // ─── Content Router ──────────────────────────────────────────────
   const renderContent = () => {
     if (editing) return renderForm(editing.collection, editing.item);
@@ -535,6 +866,10 @@ export default function StoryAtlasWorkspace() {
     if (section === "stats") return <ProjectStats data={data} theme={t} />;
     if (section === "atlasMap") return <AtlasMap data={data} onView={(col, item) => setViewing({ collection: col, item })} theme={t} />;
     if (section === "scratchpad") return <Scratchpad text={scratchpadText} onChange={onScratchChange} onSave={saveScratchNow} theme={t} />;
+    if (section === "seriesListing") return renderSeriesListing();
+    if (section === "readerMode") return renderReaderMode();
+    if (section === "seriesDashboard") return renderSeriesDashboard();
+    if (section === "pitchBible") return renderPitchBible();
     return <div style={{ padding: "2rem", color: t.textDim, textAlign: "center" }}>Select a section from the sidebar</div>;
   };
 
@@ -638,6 +973,17 @@ export default function StoryAtlasWorkspace() {
               );
             })}
 
+            {/* Publish */}
+            <div style={{ marginTop: "0.75rem" }}>
+              <div style={{ fontSize: "0.6rem", color: t.textDim, letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 700, padding: "0.3rem 0.5rem" }}>PUBLISH</div>
+              {Object.entries(PUBLISH_SECTIONS).map(([key, ps]) => (
+                <NavItem key={key} label={ps.label} icon={ps.icon} color={ps.color}
+                  active={section === key && !editing && !viewing}
+                  onClick={() => { setSection(key); setEditing(null); setViewing(null); }}
+                  theme={t} />
+              ))}
+            </div>
+
             {/* Workspace */}
             <div style={{ marginTop: "0.75rem" }}>
               <div style={{ fontSize: "0.6rem", color: t.textDim, letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 700, padding: "0.3rem 0.5rem" }}>WORKSPACE</div>
@@ -670,7 +1016,7 @@ export default function StoryAtlasWorkspace() {
           <span style={{ marginLeft: "auto", color: saveStatus === "error" ? t.danger : saveStatus === "saving" ? t.accent : saveStatus === "saved" ? t.success : t.textDim }}>
             {saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved" : saveStatus === "error" ? "Save failed" : "Ready"}
           </span>
-          <span style={{ cursor: "pointer" }} onClick={() => setCmdOpen(true)} title="Ctrl+K">\u2318K</span>
+          <span style={{ cursor: "pointer" }} onClick={() => setCmdOpen(true)} title="Ctrl+K">{"\u2318"}K</span>
         </div>
       </div>
 
@@ -731,7 +1077,7 @@ function FormFields({ fields, initial, onSubmit, accent, theme: t, inputStyle })
           )}
           {f.t === "select" ? (
             <select value={values[f.k] || ""} onChange={e => set(f.k, e.target.value)} style={inputStyle}>
-              <option value="">\u2014 Select \u2014</option>
+              <option value="">{"\u2014 Select \u2014"}</option>
               {f.opts.map(o => <option key={o} value={o}>{o}</option>)}
             </select>
           ) : f.t === "textarea" ? (
