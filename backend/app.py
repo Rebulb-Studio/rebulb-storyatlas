@@ -140,7 +140,6 @@ def import_payload_into_db(conn: sqlite3.Connection, payload: dict[str, Any]) ->
             save_entry(conn, collection, entry)
 
 
-
 def create_app() -> Flask:
     app = Flask(__name__)
     secret = os.environ.get('WORLDFORGE_SECRET_KEY')
@@ -294,8 +293,11 @@ def create_app() -> Flask:
                 except json.JSONDecodeError:
                     corrupted += 1
         conn.close()
-        return jsonify({'status': 'ok', 'totalEntries': total, 'corruptedEntries': corrupted})
-
+        return jsonify({
+            'status': 'ok',
+            'totalEntries': total,
+            'corruptedEntries': corrupted,
+        })
 
     @app.route('/api/export.json')
     def api_export_json():
@@ -379,15 +381,35 @@ def create_app() -> Flask:
                 title = item.get('title') or item.get('name') or item.get('id') or 'untitled'
                 slug = safe_slug(title)
                 plain = strip_html(item.get('content', ''))
-                zf.writestr(
-                    f'{root}/manuscripts/{slug}.txt',
-                    f"# {title}\n\nStatus: {item.get('status', '')}\nLinked Chapter: {item.get('linkedChapter', 'N/A')}\n\n---\n\n{plain}\n",
+                status_val = item.get('status', '')
+                ch_link = item.get('linkedChapter', 'N/A')
+                ms_txt = (
+                    f"# {title}\n\nStatus: {status_val}\n"
+                    f"Linked Chapter: {ch_link}\n\n---\n\n{plain}\n"
                 )
-                safe_content = (item.get('content', '') or '').replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
-                safe_title = title.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
                 zf.writestr(
-                    f'{root}/manuscripts/{slug}.html',
-                    f"<!doctype html><html><head><meta charset='utf-8'><title>{safe_title}</title></head><body><pre>{safe_content}</pre></body></html>",
+                    f'{root}/manuscripts/{slug}.txt', ms_txt,
+                )
+                safe_content = (
+                    (item.get('content', '') or '')
+                    .replace('&', '&amp;')
+                    .replace('<', '&lt;')
+                    .replace('>', '&gt;')
+                )
+                safe_title = (
+                    title.replace('&', '&amp;')
+                    .replace('<', '&lt;')
+                    .replace('>', '&gt;')
+                )
+                ms_html = (
+                    f"<!doctype html><html><head>"
+                    f"<meta charset='utf-8'>"
+                    f"<title>{safe_title}</title></head>"
+                    f"<body><pre>{safe_content}</pre>"
+                    f"</body></html>"
+                )
+                zf.writestr(
+                    f'{root}/manuscripts/{slug}.html', ms_html,
                 )
 
             timeline_rows = ['Date,DateValue,Name,Type,Scale,Overview']
@@ -419,8 +441,20 @@ def create_app() -> Flask:
             zf.writestr(f'{root}/world_bible.md', build_world_bible(data))
             zf.writestr(f'{root}/world_bible.html', build_world_bible_html(data))
             zf.writestr(f'{root}/indexes/collection_index.md', build_collection_index(data))
-            zf.writestr(f'{root}/indexes/relationship_index.json', json.dumps(build_relationship_index(data), indent=2, ensure_ascii=False))
-            zf.writestr(f'{root}/indexes/export_manifest.json', json.dumps(build_export_manifest(data), indent=2, ensure_ascii=False))
+            rel_json = json.dumps(
+                build_relationship_index(data), indent=2,
+                ensure_ascii=False,
+            )
+            zf.writestr(
+                f'{root}/indexes/relationship_index.json', rel_json,
+            )
+            manifest_json = json.dumps(
+                build_export_manifest(data), indent=2,
+                ensure_ascii=False,
+            )
+            zf.writestr(
+                f'{root}/indexes/export_manifest.json', manifest_json,
+            )
 
         buffer.seek(0)
         return send_file(
@@ -610,7 +644,10 @@ def create_app() -> Flask:
 
         conn = get_connection()
         results: list[dict[str, Any]] = []
-        search_collections = [collection_filter] if collection_filter and collection_filter in COLLECTIONS else COLLECTIONS
+        if collection_filter and collection_filter in COLLECTIONS:
+            search_collections = [collection_filter]
+        else:
+            search_collections = COLLECTIONS
 
         for col in search_collections:
             for item in load_collection(conn, col):
@@ -628,7 +665,12 @@ def create_app() -> Flask:
                 # Tag filter
                 if tag_filter:
                     tags_val = item.get('_tags', '')
-                    tag_list = tags_val.split(',') if isinstance(tags_val, str) else (tags_val if isinstance(tags_val, list) else [])
+                    if isinstance(tags_val, str):
+                        tag_list = tags_val.split(',')
+                    elif isinstance(tags_val, list):
+                        tag_list = tags_val
+                    else:
+                        tag_list = []
                     if tag_filter not in [t.strip() for t in tag_list]:
                         continue
                 item['_collection'] = col
@@ -671,7 +713,13 @@ def create_app() -> Flask:
                         csv_escape(item.get('status', '')),
                         csv_escape(item.get('createdAt', '')),
                         csv_escape(item.get('updatedAt', '')),
-                        csv_escape(json.dumps({k: v for k, v in item.items() if k not in ('id', 'name', 'title', 'status', 'createdAt', 'updatedAt')}, ensure_ascii=False)),
+                        csv_escape(json.dumps(
+                            {k: v for k, v in item.items()
+                             if k not in ('id', 'name', 'title',
+                                          'status', 'createdAt',
+                                          'updatedAt')},
+                            ensure_ascii=False,
+                        )),
                     ]
                     buffer.write(','.join(row) + '\n')
             return Response(
@@ -900,7 +948,10 @@ def save_version(conn: sqlite3.Connection, collection: str, entry_id: str, entry
     # Keep only last 30 versions per entry
     conn.execute(
         'DELETE FROM entry_versions WHERE entry_id = ? AND collection_name = ? '
-        'AND version_id NOT IN (SELECT version_id FROM entry_versions WHERE entry_id = ? AND collection_name = ? ORDER BY created_at DESC LIMIT 30)',
+        'AND version_id NOT IN ('
+        'SELECT version_id FROM entry_versions '
+        'WHERE entry_id = ? AND collection_name = ? '
+        'ORDER BY created_at DESC LIMIT 30)',
         (entry_id, collection, entry_id, collection),
     )
 
@@ -1063,14 +1114,42 @@ def build_world_bible(data: dict[str, Any]) -> str:
                     lines.append(f'- **{field}:** {preview[:320]}\n')
             lines.append('\n')
 
-    add_section('Core Characters', 'characters', ['role', 'affiliation', 'powerTier', 'personality', 'motivations', 'storyNotes'])
-    add_section('Important Locations', 'locations', ['type', 'region', 'controlledBy', 'overview', 'storySignificance'])
-    add_section('Factions', 'factions', ['type', 'leader', 'territory', 'overview', 'ideology', 'goals'])
-    add_section('Power Systems', 'systems', ['type', 'overview', 'mechanics', 'costs', 'counters'])
-    add_section('Lore & Concepts', 'lore', ['category', 'overview', 'description'])
-    add_section('Plot Arcs', 'plots', ['type', 'status', 'synopsis', 'conflict', 'resolution'])
-    add_section('Timeline Highlights', 'timelineEvents', ['date', 'type', 'scale', 'overview'], limit=20)
-    add_section('Bibliography & Influences', 'bibliography', ['type', 'creator', 'influence', 'aspects'])
+    add_section(
+        'Core Characters', 'characters',
+        ['role', 'affiliation', 'powerTier',
+         'personality', 'motivations', 'storyNotes'],
+    )
+    add_section(
+        'Important Locations', 'locations',
+        ['type', 'region', 'controlledBy',
+         'overview', 'storySignificance'],
+    )
+    add_section(
+        'Factions', 'factions',
+        ['type', 'leader', 'territory',
+         'overview', 'ideology', 'goals'],
+    )
+    add_section(
+        'Power Systems', 'systems',
+        ['type', 'overview', 'mechanics', 'costs', 'counters'],
+    )
+    add_section(
+        'Lore & Concepts', 'lore',
+        ['category', 'overview', 'description'],
+    )
+    add_section(
+        'Plot Arcs', 'plots',
+        ['type', 'status', 'synopsis',
+         'conflict', 'resolution'],
+    )
+    add_section(
+        'Timeline Highlights', 'timelineEvents',
+        ['date', 'type', 'scale', 'overview'], limit=20,
+    )
+    add_section(
+        'Bibliography & Influences', 'bibliography',
+        ['type', 'creator', 'influence', 'aspects'],
+    )
     return ''.join(lines)
 
 
@@ -1093,7 +1172,19 @@ def build_world_bible_html(data: dict[str, Any]) -> str:
         else:
             blocks.append(f'<p>{block.replace(chr(10), "<br>")}</p>')
     title = data.get('meta', {}).get('projectName', 'World Bible')
-    return f"<!doctype html><html><head><meta charset='utf-8'><title>{title}</title><style>body{{font-family:Arial,sans-serif;max-width:900px;margin:40px auto;padding:0 20px;line-height:1.6;color:#111}}h1,h2,h3{{line-height:1.2}}ul{{padding-left:20px}}</style></head><body>{''.join(blocks)}</body></html>"
+    css = (
+        "body{font-family:Arial,sans-serif;max-width:900px;"
+        "margin:40px auto;padding:0 20px;line-height:1.6;"
+        "color:#111}h1,h2,h3{line-height:1.2}"
+        "ul{padding-left:20px}"
+    )
+    body = ''.join(blocks)
+    return (
+        f"<!doctype html><html><head>"
+        f"<meta charset='utf-8'><title>{title}</title>"
+        f"<style>{css}</style></head>"
+        f"<body>{body}</body></html>"
+    )
 
 
 app = create_app()
