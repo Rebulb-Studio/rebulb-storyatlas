@@ -1,2 +1,2 @@
-flask>=3.0
-flask-cors>=4.0
+Flask==3.0.3
+Markdown==3.6
