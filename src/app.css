@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+@theme {
+  /* Dark theme colors (default) */
+  --color-bg: #06060f;
+  --color-surface: rgba(255, 255, 255, 0.02);
+  --color-surface-hover: rgba(255, 255, 255, 0.05);
+  --color-border: rgba(255, 255, 255, 0.06);
+  --color-border-hover: rgba(255, 255, 255, 0.12);
+  --color-text-primary: #e2e8f0;
+  --color-text-muted: #94a3b8;
+  --color-text-dim: #64748b;
+  --color-text-bright: #f1f5f9;
+  --color-accent: #a855f7;
+  --color-accent-dim: rgba(168, 85, 247, 0.12);
+  --color-input: rgba(255, 255, 255, 0.04);
+  --color-input-border: rgba(255, 255, 255, 0.1);
+  --color-danger: #ef4444;
+  --color-success: #22c55e;
+  --color-info: #3b82f6;
+  --font-sans: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+}
+
+/* Light theme override */
+.light {
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f1f5f9;
+  --color-border: #e2e8f0;
+  --color-border-hover: #cbd5e1;
+  --color-text-primary: #1e293b;
+  --color-text-muted: #64748b;
+  --color-text-dim: #94a3b8;
+  --color-text-bright: #0f172a;
+  --color-accent: #7c3aed;
+  --color-accent-dim: rgba(124, 58, 237, 0.08);
+  --color-input: #ffffff;
+  --color-input-border: #cbd5e1;
+  --color-danger: #dc2626;
+  --color-success: #16a34a;
+  --color-info: #2563eb;
+}
+
+/* Base styles */
+* { box-sizing: border-box; margin: 0; }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-thumb { background: var(--color-accent); border-radius: 3px; }
+::selection { background: rgba(168, 85, 247, 0.3); }
+
+details > summary { list-style: none; }
+details > summary::-webkit-details-marker { display: none; }
+
+textarea:focus, input:focus, select:focus {
+  outline: none;
+  border-color: rgba(168, 85, 247, 0.5) !important;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.13);
+}
+
+select {
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  padding-right: 2rem;
+}
+
+@media (max-width: 768px) {
+  .studio-sidebar { position: fixed !important; left: 0; top: 0; z-index: 100; height: 100vh; box-shadow: 4px 0 20px rgba(0,0,0,0.5); }
+  .studio-sidebar.closed { transform: translateX(-100%); width: 0 !important; }
+  .studio-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+  .studio-main { width: 100% !important; }
+}
+
+@media (max-width: 480px) {
+  .studio-main { padding: 0.75rem !important; }
+}
