@@ -163,28 +163,50 @@ function WorkspacePage() {
     }, 700);
   }, []);
 
-  switch (view) {
-    case "worldBible":
-      return <WorldBible data={data} projectMeta={meta} onNavigate={(s) => navigate(`/${s}`)} theme={theme} />;
-    case "storyCanvas":
-      return <StoryCanvas data={data} projectMeta={meta} onView={(col, item) => navigate(`/${col}/${item.id}`)} onUpdateMeta={updateMeta} theme={theme} />;
-    case "canonGraph":
-      return <CanonGraph data={data} onView={(col, item) => navigate(`/${col}/${item.id}`)} theme={theme} />;
-    case "forceGraph":
-      return <ForceGraph data={data} onView={(col, item) => navigate(`/${col}/${item.id}`)} theme={theme} />;
-    case "timeline":
-      return <TimelineView data={data} onView={(col, item) => navigate(`/${col}/${item.id}`)} theme={theme} />;
-    case "stats":
-      return <ProjectStats data={data} theme={theme} />;
-    case "atlasMap":
-      return <AtlasMap data={data} onView={(col, item) => navigate(`/${col}/${item.id}`)} theme={theme} />;
-    case "scratchpad":
-      return <Scratchpad text={scratchpadText} onChange={onScratchChange} onSave={() => {
-        if (scratchTimer.current) clearTimeout(scratchTimer.current);
-        useUIStore.getState().withSave(() => api.updateMeta({ scratchpad: scratchpadText }));
-      }} theme={theme} />;
-    default:
-      return <div className="p-8 text-text-dim text-center">Unknown workspace view</div>;
+  const viewNav = (col: string, item: Entry) => navigate(`/${col}/${item.id}`);
+
+  try {
+    switch (view) {
+      case "worldBible":
+        return <WorldBible data={data} projectMeta={meta} onNavigate={(s) => navigate(`/${s}`)} theme={theme} />;
+      case "storyCanvas":
+        return <StoryCanvas data={data} projectMeta={meta} onView={viewNav} onUpdateMeta={updateMeta} theme={theme} />;
+      case "canonGraph":
+        return <CanonGraph data={data} onView={viewNav} theme={theme} />;
+      case "forceGraph":
+        return <ForceGraph data={data} onView={viewNav} theme={theme} />;
+      case "timeline":
+        return <TimelineView data={data} onView={viewNav} theme={theme} />;
+      case "stats":
+        return <ProjectStats data={data} theme={theme} />;
+      case "atlasMap":
+        return <AtlasMap data={data} onView={viewNav} theme={theme} />;
+      case "scratchpad":
+        return <Scratchpad text={scratchpadText} onChange={onScratchChange} onSave={() => {
+          if (scratchTimer.current) clearTimeout(scratchTimer.current);
+          useUIStore.getState().withSave(() => api.updateMeta({ scratchpad: scratchpadText }));
+        }} theme={theme} />;
+      default:
+        return (
+          <div style={{ padding: "2rem", textAlign: "center", color: theme.textDim }}>
+            <p>Unknown workspace view: {view}</p>
+            <button onClick={() => navigate("/")} style={{ marginTop: "1rem", color: theme.accent, background: "none", border: `1px solid ${theme.accent}40`, padding: "0.5rem 1rem", borderRadius: "8px", cursor: "pointer", fontFamily: "inherit" }}>
+              Back to Dashboard
+            </button>
+          </div>
+        );
+    }
+  } catch (err) {
+    console.error("Workspace render error:", err);
+    return (
+      <div style={{ padding: "2rem", textAlign: "center", color: theme.danger }}>
+        <p>Failed to load workspace view: {view}</p>
+        <p style={{ fontSize: "0.8rem", color: theme.textDim }}>{err instanceof Error ? err.message : "Unknown error"}</p>
+        <button onClick={() => navigate("/")} style={{ marginTop: "1rem", color: theme.accent, background: "none", border: `1px solid ${theme.accent}40`, padding: "0.5rem 1rem", borderRadius: "8px", cursor: "pointer", fontFamily: "inherit" }}>
+          Back to Dashboard
+        </button>
+      </div>
+    );
   }
 }
 
@@ -269,7 +291,7 @@ export default function App() {
       id: `ws:${key}`, label: ws.label, icon: ws.icon, group: "WORKSPACE",
       action: () => navigate(`/workspace/${key}`),
     })),
-    { id: "nav:dashboard", label: "Dashboard", icon: "\u2302", group: "NAV", action: () => navigate("/") },
+    { id: "nav:dashboard", label: "Dashboard", icon: "\u{1F3E0}", group: "NAV", action: () => navigate("/") },
     { id: "nav:search", label: "Advanced Search", icon: "\u{1F50D}", group: "NAV", action: () => navigate("/search") },
     { id: "nav:writing", label: "Writing Tools", icon: "\u270E", group: "NAV", action: () => navigate("/writing-tools") },
     { id: "nav:export", label: "Export Panel", icon: "\u{1F4E6}", group: "NAV", action: () => navigate("/export") },

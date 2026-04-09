@@ -96,7 +96,7 @@ export default function Sidebar({ navigate, theme: t }: { navigate: (path: strin
             </div>
           )}
 
-          <NavItem label="Dashboard" icon="\u2302" active={currentPath === "/"} onClick={() => { navigate("/"); setFilterText(""); }} theme={t} />
+          <NavItem label="Dashboard" icon={"\u{1F3E0}"} active={currentPath === "/"} onClick={() => { navigate("/"); setFilterText(""); }} theme={t} />
 
           {NAV_GROUPS.filter((g: string) => g !== "WORKSPACE").map((group: string) => {
             const items = Object.entries(COLLECTION_DEFS).filter(([, v]) => v.group === group);
