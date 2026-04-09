@@ -249,30 +249,31 @@ export default function App() {
   const { meta, setMeta, setScratchpadText } = useProjectStore();
   const theme: Theme = darkMode ? DARK_THEME : LIGHT_THEME;
 
-  // ─── Load data on mount ───────────────────────────────────────
+  // ─── Load data on mount (backend → localStorage fallback) ──
   useEffect(() => {
     (async () => {
-      try {
-        const payload = await api.loadAll();
-        const { meta: loadedMeta, ...collections } = payload;
-        setData(collections as Record<string, Entry[]>);
-        useDataStore.setState({ loaded: true });
-        if (loadedMeta) {
-          setMeta(loadedMeta as Record<string, unknown>);
-          if ((loadedMeta as Record<string, unknown>).scratchpad) {
-            setScratchpadText((loadedMeta as Record<string, unknown>).scratchpad as string);
-          }
+      const loadedMeta = await useDataStore.getState().loadAll();
+      if (loadedMeta) {
+        setMeta(loadedMeta as Record<string, unknown>);
+        if ((loadedMeta as Record<string, unknown>).scratchpad) {
+          setScratchpadText((loadedMeta as Record<string, unknown>).scratchpad as string);
         }
-        const totalEntries = Object.values(collections).reduce(
-          (s: number, arr) => s + (Array.isArray(arr) ? arr.length : 0), 0
-        );
-        if (!(loadedMeta as Record<string, unknown>)?.projectName && !localStorage.getItem("sa_onboarding_done") && totalEntries === 0) {
-          useUIStore.setState({ showOnboarding: true });
-        }
-      } catch (err) {
-        console.error("StoryAtlas: failed to load data", err);
-        toast("Could not connect to backend. Running in offline mode.", "error");
-        useDataStore.setState({ loaded: true });
+      }
+      // Restore scratchpad from local backup
+      const localScratch = localStorage.getItem("sa_scratchpad_local");
+      if (localScratch && !useProjectStore.getState().scratchpadText) {
+        setScratchpadText(localScratch);
+      }
+      const { backendOnline } = useDataStore.getState();
+      if (!backendOnline) {
+        toast("Offline mode — your work is saved locally and will sync when the backend is available.", "info");
+      }
+      const allData = useDataStore.getState().data;
+      const totalEntries = Object.values(allData).reduce(
+        (s: number, arr) => s + (Array.isArray(arr) ? arr.length : 0), 0
+      );
+      if (!useProjectStore.getState().meta.projectName && !localStorage.getItem("sa_onboarding_done") && totalEntries === 0) {
+        useUIStore.setState({ showOnboarding: true });
       }
     })();
   }, []);

@@ -7,6 +7,7 @@ import type { Theme } from "../types";
 
 export default function StatusBar({ theme: t }: { theme: Theme }) {
   const data = useDataStore((s) => s.data);
+  const backendOnline = useDataStore((s) => s.backendOnline);
   const saveStatus = useUIStore((s) => s.saveStatus);
   const setCmdOpen = useUIStore((s) => s.setCmdOpen);
   const meta = useProjectStore((s) => s.meta);
@@ -28,11 +29,21 @@ export default function StatusBar({ theme: t }: { theme: Theme }) {
       <span>{estimateTotalWords(data, scratchpadText).toLocaleString()} words</span>
       <span style={{
         marginLeft: "auto",
-        color: saveStatus === "error" ? t.danger : saveStatus === "saving" ? t.accent : saveStatus === "saved" ? t.success : t.textDim,
+        display: "flex", alignItems: "center", gap: "0.5rem",
       }}>
-        {saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved" : saveStatus === "error" ? "Save failed" : "Ready"}
+        {!backendOnline && (
+          <span style={{ color: t.danger, display: "flex", alignItems: "center", gap: "0.25rem" }}>
+            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: t.danger, display: "inline-block" }} />
+            Offline
+          </span>
+        )}
+        <span style={{
+          color: saveStatus === "error" ? t.danger : saveStatus === "saving" ? t.accent : saveStatus === "saved" ? t.success : t.textDim,
+        }}>
+          {saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved" : saveStatus === "error" ? "Save failed" : backendOnline ? "Ready" : "Local"}
+        </span>
       </span>
-      <span style={{ cursor: "pointer" }} onClick={() => setCmdOpen(true)} title="Ctrl+K">{"\u2318"}K</span>
+      <span style={{ cursor: "pointer" }} onClick={() => setCmdOpen(true)} title="Ctrl+K">{"\u{2318}"}K</span>
     </div>
   );
 }
