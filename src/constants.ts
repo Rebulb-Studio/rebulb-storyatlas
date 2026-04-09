@@ -4,22 +4,22 @@ import type { CollectionDef, FormatPreset, OutlineMethod, Theme } from "./types"
 export const FORMAT_PRESETS: Record<string, FormatPreset> = {
   lightNovel: { label: "Light Novel", icon: "\u{1F4D6}", chapterWords: "4000\u20136000", volumeChapters: "8\u201312", pov: "First Person", tense: "Past", notes: "Internal monologue heavy, short punchy chapters, cliffhangers, illustrations every 30\u201350 pages" },
   graphicNovel: { label: "Graphic Novel", icon: "\u{1F3A8}", chapterWords: "Script pages", volumeChapters: "22\u201328 pages", pov: "Third Limited / Visual", tense: "Present (visual)", notes: "Panel-driven, 5\u20137 panels/page avg, splash pages for impact, visual metaphors, minimal exposition" },
-  manga: { label: "Manga", icon: "\u2B1B", chapterWords: "16\u201320 pages", volumeChapters: "8\u201310 chapters/volume", pov: "Multiple", tense: "Visual Present", notes: "Right-to-left, speed lines, SD moments, double-page spreads, weekly/monthly rhythm" },
+  manga: { label: "Manga", icon: "\u{1F5BE}", chapterWords: "16\u201320 pages", volumeChapters: "8\u201310 chapters/volume", pov: "Multiple", tense: "Visual Present", notes: "Right-to-left, speed lines, SD moments, double-page spreads, weekly/monthly rhythm" },
   webtoon: { label: "Webtoon", icon: "\u{1F4F1}", chapterWords: "60\u201380 panels", volumeChapters: "Season-based (50\u201380 eps)", pov: "Third Limited", tense: "Present", notes: "Vertical scroll, one panel wide, color mandatory, hook in first 3 panels, end-of-ep cliffhanger" },
   novel: { label: "Novel", icon: "\u{1F4D5}", chapterWords: "3000\u20135000", volumeChapters: "20\u201335 chapters", pov: "Third Limited / Multiple", tense: "Past", notes: "Deep prose, subtext, thematic density, scene-sequel rhythm" },
   webSerial: { label: "Web Serial", icon: "\u{1F310}", chapterWords: "2000\u20134000", volumeChapters: "Arc-based", pov: "First / Third", tense: "Past / Present", notes: "Frequent releases, strong hooks, community engagement, progression fantasy popular" },
-  screenplay: { label: "Screenplay", icon: "\u{1F3AC}", chapterWords: "Scene-based", volumeChapters: "3 Acts / 8 Sequences", pov: "Camera", tense: "Present", notes: "Slug lines, action blocks, parentheticals, 1 page \u2248 1 minute" },
+  screenplay: { label: "Screenplay", icon: "\u{1F3AC}", chapterWords: "Scene-based", volumeChapters: "3 Acts / 8 Sequences", pov: "Camera", tense: "Present", notes: "Slug lines, action blocks, parentheticals, 1 page \≈ 1 minute" },
 };
 
 // ─── Outline Methods ──────────────────────────────────────────────────
 export const OUTLINE_METHODS: OutlineMethod[] = [
-  { id: "threeAct", label: "Three-Act Structure", desc: "Setup \u2192 Confrontation \u2192 Resolution", beats: ["Hook","Inciting Incident","First Plot Point","Rising Action","Midpoint","Crisis","Climax","Falling Action","Resolution"] },
-  { id: "kishotenketsu", label: "Kish\u014Dtenketsu", desc: "Introduction \u2192 Development \u2192 Twist \u2192 Conclusion (no central conflict required)", beats: ["Ki (Introduction)","Sh\u014D (Development)","Ten (Twist/Complication)","Ketsu (Conclusion)"] },
+  { id: "threeAct", label: "Three-Act Structure", desc: "Setup \→ Confrontation \→ Resolution", beats: ["Hook","Inciting Incident","First Plot Point","Rising Action","Midpoint","Crisis","Climax","Falling Action","Resolution"] },
+  { id: "kishotenketsu", label: "Kish\ōtenketsu", desc: "Introduction \→ Development \→ Twist \→ Conclusion (no central conflict required)", beats: ["Ki (Introduction)","Sh\ō (Development)","Ten (Twist/Complication)","Ketsu (Conclusion)"] },
   { id: "saveTheCat", label: "Save the Cat!", desc: "15-beat structure for compelling narrative pacing", beats: ["Opening Image","Theme Stated","Setup","Catalyst","Debate","Break into Two","B Story","Fun and Games","Midpoint","Bad Guys Close In","All Is Lost","Dark Night of Soul","Break into Three","Finale","Final Image"] },
   { id: "heros", label: "Hero's Journey", desc: "Campbell/Vogler monomyth", beats: ["Ordinary World","Call to Adventure","Refusal","Meeting the Mentor","Crossing the Threshold","Tests, Allies, Enemies","Approach","Ordeal","Reward","The Road Back","Resurrection","Return with Elixir"] },
   { id: "snowflake", label: "Snowflake Method", desc: "Fractal expansion from sentence to full outline", beats: ["One-Sentence Summary","One-Paragraph Summary","Character Summaries","Expand to Full Page","Character Synopses","Expand to 4 Pages","Character Charts","Scene List","Scene Details"] },
-  { id: "sevenPoint", label: "Seven-Point Story", desc: "Dan Wells method \u2014 work backwards from resolution", beats: ["Hook","Plot Turn 1","Pinch Point 1","Midpoint","Pinch Point 2","Plot Turn 2","Resolution"] },
-  { id: "fichtean", label: "Fichtean Curve", desc: "Start in crisis \u2014 no slow setup, immediate tension", beats: ["Crisis 1 (Opening)","Rising Crises","Crisis Escalation","Climax","Falling Action"] },
+  { id: "sevenPoint", label: "Seven-Point Story", desc: "Dan Wells method \— work backwards from resolution", beats: ["Hook","Plot Turn 1","Pinch Point 1","Midpoint","Pinch Point 2","Plot Turn 2","Resolution"] },
+  { id: "fichtean", label: "Fichtean Curve", desc: "Start in crisis \— no slow setup, immediate tension", beats: ["Crisis 1 (Opening)","Rising Crises","Crisis Escalation","Climax","Falling Action"] },
 ];
 
 export const SCENE_TYPES = ["Action","Dialogue","Exposition","Flashback","Dream","Training","Battle","Revelation","Romance","Aftermath","Travel","Political","Ritual","Transformation","Death","Reunion","Betrayal","Escape","Investigation","Duel"];
@@ -29,7 +29,7 @@ export const PACING = ["Slow Burn","Building","Moderate","Intense","Breakneck","
 // ─── Collection Definitions ───────────────────────────────────────────
 export const COLLECTION_DEFS: Record<string, CollectionDef> = {
   characters: {
-    label: "Characters", icon: "\u25C8", color: "#8b5cf6", group: "WIKI",
+    label: "Characters", icon: "\u{1F464}", color: "#8b5cf6", group: "WIKI",
     fields: [
       { k:"name", l:"Full Name", t:"text" },
       { k:"aliases", l:"Aliases", t:"tags" },
@@ -60,7 +60,7 @@ export const COLLECTION_DEFS: Record<string, CollectionDef> = {
     ]
   },
   locations: {
-    label: "Locations", icon: "\u25C9", color: "#10b981", group: "WIKI",
+    label: "Locations", icon: "\u{1F3D7}\uFE0F", color: "#10b981", group: "WIKI",
     fields: [
       { k:"name", l:"Name", t:"text" },
       { k:"type", l:"Type", t:"select", opts:["City","District","Building","Region","Nation","Continent","Realm","Landmark","Underground","Floating","Pocket Dimension","Ruin","Other"] },
@@ -82,7 +82,7 @@ export const COLLECTION_DEFS: Record<string, CollectionDef> = {
     ]
   },
   factions: {
-    label: "Factions", icon: "\u25C6", color: "#ef4444", group: "WIKI",
+    label: "Factions", icon: "\u{1F6E1}\uFE0F", color: "#ef4444", group: "WIKI",
     fields: [
       { k:"name", l:"Name", t:"text" },
       { k:"type", l:"Type", t:"select", opts:["Government","Military","Secret Society","Criminal","Religious","Bloodline","Corporate","Resistance","Academy","Guild","Mercenary","Other"] },
@@ -103,7 +103,7 @@ export const COLLECTION_DEFS: Record<string, CollectionDef> = {
     ]
   },
   items: {
-    label: "Items & Artifacts", icon: "\u25C7", color: "#f59e0b", group: "WIKI",
+    label: "Items & Artifacts", icon: "\u{1F48E}", color: "#f59e0b", group: "WIKI",
     fields: [
       { k:"name", l:"Name", t:"text" },
       { k:"type", l:"Type", t:"select", opts:["Weapon","Armor","Tool","Key Item","Relic","Consumable","Vehicle","Document","Currency","Other"] },
@@ -119,7 +119,7 @@ export const COLLECTION_DEFS: Record<string, CollectionDef> = {
     ]
   },
   lore: {
-    label: "Lore & Concepts", icon: "\u25CE", color: "#06b6d4", group: "WORLDBUILDING",
+    label: "Lore & Concepts", icon: "\u{1F4DC}", color: "#06b6d4", group: "WORLDBUILDING",
     fields: [
       { k:"name", l:"Name", t:"text" },
       { k:"category", l:"Category", t:"select", opts:["Myth","Legend","Prophecy","Law","Science","Philosophy","Religion","Taboo","Custom","Theory","Secret","Other"] },
@@ -131,7 +131,7 @@ export const COLLECTION_DEFS: Record<string, CollectionDef> = {
     ]
   },
   history: {
-    label: "World History", icon: "\u2295", color: "#7c3aed", group: "WORLDBUILDING",
+    label: "World History", icon: "\u{1F3DB}\uFE0F", color: "#7c3aed", group: "WORLDBUILDING",
     fields: [
       { k:"name", l:"Event Name", t:"text" },
       { k:"era", l:"Era / Period", t:"text" },
@@ -146,7 +146,7 @@ export const COLLECTION_DEFS: Record<string, CollectionDef> = {
     ]
   },
   systems: {
-    label: "Power Systems", icon: "\u2297", color: "#3b82f6", group: "WORLDBUILDING",
+    label: "Power Systems", icon: "\u{26A1}", color: "#3b82f6", group: "WORLDBUILDING",
     fields: [
       { k:"name", l:"System Name", t:"text" },
       { k:"type", l:"Type", t:"select", opts:["Magic","Technology","Martial","Psychic","Biological","Divine","Alchemical","Contractual","Hybrid","Other"] },
@@ -166,7 +166,7 @@ export const COLLECTION_DEFS: Record<string, CollectionDef> = {
     ]
   },
   cultures: {
-    label: "Cultures", icon: "\u2298", color: "#ec4899", group: "WORLDBUILDING",
+    label: "Cultures", icon: "\u{1F30D}", color: "#ec4899", group: "WORLDBUILDING",
     fields: [
       { k:"name", l:"Name", t:"text" },
       { k:"region", l:"Region", t:"text" },
@@ -198,7 +198,7 @@ export const COLLECTION_DEFS: Record<string, CollectionDef> = {
     ]
   },
   timelineEvents: {
-    label: "Timeline", icon: "\u22A0", color: "#f59e0b", group: "WORLDBUILDING",
+    label: "Timeline", icon: "\u{23F3}", color: "#f59e0b", group: "WORLDBUILDING",
     fields: [
       { k:"name", l:"Event Name", t:"text" },
       { k:"date", l:"Date", t:"text" },
@@ -209,13 +209,13 @@ export const COLLECTION_DEFS: Record<string, CollectionDef> = {
     ]
   },
   plots: {
-    label: "Plots & Arcs", icon: "\u229E", color: "#8b5cf6", group: "STORY",
+    label: "Plots & Arcs", icon: "\u{1F4D1}", color: "#8b5cf6", group: "STORY",
     fields: [
       { k:"name", l:"Arc Name", t:"text" },
       { k:"type", l:"Type", t:"select", opts:["Main Plot","Subplot","Character Arc","Romance Arc","Mystery","Revenge","Political","War","Training","Tournament","Heist","Redemption","Tragedy","Coming of Age","Other"] },
       { k:"status", l:"Status", t:"select", opts:["Planned","In Progress","Complete","Abandoned","Reworking"] },
       { k:"volume", l:"Volume / Part", t:"text" },
-      { k:"method", l:"Structure Method", t:"select", opts:["Three-Act","Kish\u014Dtenketsu","Save the Cat","Hero's Journey","Snowflake","Seven-Point","Fichtean","Custom"] },
+      { k:"method", l:"Structure Method", t:"select", opts:["Three-Act","Kish\ōtenketsu","Save the Cat","Hero's Journey","Snowflake","Seven-Point","Fichtean","Custom"] },
       { k:"synopsis", l:"Synopsis", t:"textarea" },
       { k:"conflict", l:"Central Conflict", t:"textarea" },
       { k:"stakes", l:"Stakes", t:"textarea" },
@@ -231,7 +231,7 @@ export const COLLECTION_DEFS: Record<string, CollectionDef> = {
     ]
   },
   chapters: {
-    label: "Chapters", icon: "\u2261", color: "#0891b2", group: "STORY",
+    label: "Chapters", icon: "\u{1F4D6}", color: "#0891b2", group: "STORY",
     fields: [
       { k:"name", l:"Chapter Title", t:"text" },
       { k:"number", l:"Chapter Number", t:"text" },
@@ -253,7 +253,7 @@ export const COLLECTION_DEFS: Record<string, CollectionDef> = {
     ]
   },
   scenes: {
-    label: "Scenes", icon: "\u25B8", color: "#f97316", group: "STORY",
+    label: "Scenes", icon: "\u{1F3AC}", color: "#f97316", group: "STORY",
     fields: [
       { k:"name", l:"Scene Title", t:"text" },
       { k:"chapter", l:"Parent Chapter", t:"text" },
@@ -296,7 +296,7 @@ export const COLLECTION_DEFS: Record<string, CollectionDef> = {
     ]
   },
   combatSequences: {
-    label: "Combat Design", icon: "\u2694", color: "#dc2626", group: "CREATIVE",
+    label: "Combat Design", icon: "\u{2694}\uFE0F", color: "#dc2626", group: "CREATIVE",
     fields: [
       { k:"name", l:"Fight Name", t:"text" },
       { k:"chapter", l:"Chapter / Scene", t:"text" },
@@ -316,7 +316,7 @@ export const COLLECTION_DEFS: Record<string, CollectionDef> = {
     ]
   },
   themes: {
-    label: "Themes & Motifs", icon: "\u2726", color: "#a855f7", group: "CREATIVE",
+    label: "Themes & Motifs", icon: "\u{2728}", color: "#a855f7", group: "CREATIVE",
     fields: [
       { k:"name", l:"Theme / Motif Name", t:"text" },
       { k:"type", l:"Type", t:"select", opts:["Theme","Motif","Symbol","Recurring Image","Philosophical Question","Paradox"] },
@@ -357,7 +357,7 @@ export const COLLECTION_DEFS: Record<string, CollectionDef> = {
     ]
   },
   panels: {
-    label: "Panel Layouts", icon: "\u2B1A", color: "#f43f5e", group: "CREATIVE",
+    label: "Panel Layouts", icon: "\u{1F5BC}\uFE0F", color: "#f43f5e", group: "CREATIVE",
     fields: [
       { k:"name", l:"Page / Panel Set Name", t:"text" },
       { k:"chapter", l:"Chapter", t:"text" },
@@ -375,7 +375,7 @@ export const COLLECTION_DEFS: Record<string, CollectionDef> = {
     ]
   },
   manuscripts: {
-    label: "Manuscripts", icon: "\u270E", color: "#22c55e", group: "WRITING",
+    label: "Manuscripts", icon: "\u{270F}\uFE0F", color: "#22c55e", group: "WRITING",
     fields: [
       { k:"title", l:"Title", t:"text" },
       { k:"linkedChapter", l:"Linked Chapter", t:"text" },
@@ -387,7 +387,7 @@ export const COLLECTION_DEFS: Record<string, CollectionDef> = {
     ]
   },
   bibliography: {
-    label: "Bibliography", icon: "\u229F", color: "#64748b", group: "REFERENCE",
+    label: "Bibliography", icon: "\u{1F4DA}", color: "#64748b", group: "REFERENCE",
     fields: [
       { k:"name", l:"Title", t:"text" },
       { k:"type", l:"Type", t:"select", opts:["Anime","Manga","Light Novel","Novel","Film","TV Series","Game","Comic","Webtoon","Music","Art","Academic","Other"] },

@@ -382,7 +382,7 @@ export default function SearchPage({ navigate, theme: t }: Props) {
                 style={removeBtnStyle}
                 title="Remove filter"
               >
-                {"\u00D7"}
+                {"\×"}
               </button>
             </span>
           ))}
@@ -592,7 +592,7 @@ export default function SearchPage({ navigate, theme: t }: Props) {
                     />
                   </div>
                   <span style={{ color: t.textDim, fontSize: "0.65rem" }}>{comp}%</span>
-                  <span style={{ color: t.textDim, fontSize: "0.9rem" }}>{"\u2192"}</span>
+                  <span style={{ color: t.textDim, fontSize: "0.9rem" }}>{"\→"}</span>
                 </div>
               </button>
             );

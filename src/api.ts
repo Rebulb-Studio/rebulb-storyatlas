@@ -1,6 +1,6 @@
 import type { Entry, ProjectMeta } from "./types";
 
-const API = "/api";
+const API = import.meta.env.VITE_API_URL || "/api";
 
 async function request(
   url: string,
