@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { ProjectMeta } from "../types";
 import * as api from "../api";
+import { saveMetaToLocal } from "./useDataStore";
 
 interface ProjectState {
   meta: ProjectMeta;
@@ -27,18 +28,27 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   promptIndex: Math.floor(Math.random() * 10),
 
   setMeta: (updates) =>
-    set((state) => ({ meta: { ...state.meta, ...updates } })),
+    set((state) => {
+      const merged = { ...state.meta, ...updates };
+      saveMetaToLocal(merged as Record<string, unknown>);
+      return { meta: merged };
+    }),
 
   updateMeta: async (updates) => {
     const merged = { ...get().meta, ...updates };
     set({ meta: merged });
+    saveMetaToLocal(merged as Record<string, unknown>);
     try {
       await api.updateMeta(updates);
     } catch (err) {
-      console.error("Failed to update meta:", err);
+      console.error("Failed to sync meta to backend:", err);
     }
   },
 
-  setScratchpadText: (text) => set({ scratchpadText: text }),
+  setScratchpadText: (text) => {
+    set({ scratchpadText: text });
+    localStorage.setItem("sa_scratchpad_local", text);
+  },
+
   nextPrompt: () => set((s) => ({ promptIndex: s.promptIndex + 1 })),
 }));

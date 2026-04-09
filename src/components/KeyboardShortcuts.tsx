@@ -180,7 +180,7 @@ export function ShortcutOverlay({ open, onClose, theme: t }: ShortcutOverlayProp
               fontFamily: "inherit",
             }}
           >
-            {"\×"}
+            {"×"}
           </button>
         </div>
 

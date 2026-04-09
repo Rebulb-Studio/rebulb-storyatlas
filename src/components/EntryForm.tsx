@@ -148,7 +148,7 @@ export default function EntryForm({ collection, existing, onSubmit, onCancel, th
           )}
           {f.t === "select" ? (
             <select value={(values[f.k] as string) || ""} onChange={(e) => set(f.k, e.target.value)} style={inputStyle}>
-              <option value="">{"\— Select \—"}</option>
+              <option value="">{"— Select —"}</option>
               {f.opts?.map((o) => <option key={o} value={o}>{o}</option>)}
             </select>
           ) : f.t === "textarea" ? (

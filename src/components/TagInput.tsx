@@ -59,7 +59,7 @@ export default function TagInput({ value, onChange, allTags = [], theme: t }: Pr
           }}>
             {tag}
             <button type="button" onClick={() => removeTag(i)}
-              style={{ background: "none", border: "none", color: t.accent, cursor: "pointer", padding: 0, fontSize: "0.85rem", lineHeight: 1 }}>{"\×"}</button>
+              style={{ background: "none", border: "none", color: t.accent, cursor: "pointer", padding: 0, fontSize: "0.85rem", lineHeight: 1 }}>{"×"}</button>
           </span>
         ))}
         <input ref={inputRef} value={input}

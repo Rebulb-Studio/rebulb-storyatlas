@@ -38,6 +38,7 @@ import CalendarView from "./components/CalendarView";
 import ProUpgrade from "./components/ProUpgrade";
 import ProGate from "./components/ProGate";
 import HomePage from "./pages/HomePage";
+import SettingsPage from "./pages/SettingsPage";
 import SeriesListing from "./pages/SeriesListing";
 import ReaderMode from "./pages/ReaderMode";
 import SeriesDashboard from "./pages/SeriesDashboard";
@@ -131,10 +132,13 @@ function EntryFormPage() {
       onSubmit={async (values) => {
         if (existing) {
           await withSave(() => updateEntry(collection, existing.id, values).then(() => undefined));
+          toast("Changes saved", "success");
         } else {
           const created = await withSave(() => addEntry(collection, values));
           if (created) toast(`Created ${COLLECTION_DEFS[collection]?.label?.replace(/s$/, "") || "entry"}`, "success");
         }
+        // Yield to React render cycle so store update is visible to next route
+        await new Promise((r) => setTimeout(r, 0));
         navigate(`/${collection}`);
       }}
       onCancel={() => navigate(existing ? `/${collection}/${id}` : `/${collection}`)}
@@ -249,30 +253,31 @@ export default function App() {
   const { meta, setMeta, setScratchpadText } = useProjectStore();
   const theme: Theme = darkMode ? DARK_THEME : LIGHT_THEME;
 
-  // ─── Load data on mount ───────────────────────────────────────
+  // ─── Load data on mount (backend → localStorage fallback) ──
   useEffect(() => {
     (async () => {
-      try {
-        const payload = await api.loadAll();
-        const { meta: loadedMeta, ...collections } = payload;
-        setData(collections as Record<string, Entry[]>);
-        useDataStore.setState({ loaded: true });
-        if (loadedMeta) {
-          setMeta(loadedMeta as Record<string, unknown>);
-          if ((loadedMeta as Record<string, unknown>).scratchpad) {
-            setScratchpadText((loadedMeta as Record<string, unknown>).scratchpad as string);
-          }
+      const loadedMeta = await useDataStore.getState().loadAll();
+      if (loadedMeta) {
+        setMeta(loadedMeta as Record<string, unknown>);
+        if ((loadedMeta as Record<string, unknown>).scratchpad) {
+          setScratchpadText((loadedMeta as Record<string, unknown>).scratchpad as string);
         }
-        const totalEntries = Object.values(collections).reduce(
-          (s: number, arr) => s + (Array.isArray(arr) ? arr.length : 0), 0
-        );
-        if (!(loadedMeta as Record<string, unknown>)?.projectName && !localStorage.getItem("sa_onboarding_done") && totalEntries === 0) {
-          useUIStore.setState({ showOnboarding: true });
-        }
-      } catch (err) {
-        console.error("StoryAtlas: failed to load data", err);
-        toast("Could not connect to backend. Running in offline mode.", "error");
-        useDataStore.setState({ loaded: true });
+      }
+      // Restore scratchpad from local backup
+      const localScratch = localStorage.getItem("sa_scratchpad_local");
+      if (localScratch && !useProjectStore.getState().scratchpadText) {
+        setScratchpadText(localScratch);
+      }
+      const { backendOnline } = useDataStore.getState();
+      if (!backendOnline) {
+        toast("Offline mode — your work is saved locally and will sync when the backend is available.", "info");
+      }
+      const allData = useDataStore.getState().data;
+      const totalEntries = Object.values(allData).reduce(
+        (s: number, arr) => s + (Array.isArray(arr) ? arr.length : 0), 0
+      );
+      if (!useProjectStore.getState().meta.projectName && !localStorage.getItem("sa_onboarding_done") && totalEntries === 0) {
+        useUIStore.setState({ showOnboarding: true });
       }
     })();
   }, []);
@@ -306,6 +311,7 @@ export default function App() {
     { id: "nav:share", label: "Share Project", icon: "\u{1F517}", group: "NAV", action: () => navigate("/share") },
     { id: "nav:progress", label: "Progress Dashboard", icon: "\u{1F4CA}", group: "NAV", action: () => navigate("/progress") },
     { id: "nav:calendar", label: "Calendar View", icon: "\u{1F4C5}", group: "NAV", action: () => navigate("/calendar") },
+    { id: "nav:settings", label: "Settings", icon: "\u{2699}\uFE0F", group: "SETTINGS", action: () => navigate("/settings") },
     ...Object.entries(COLLECTION_DEFS).map(([key, cfg]) => ({
       id: `create:${key}`, label: `New ${cfg.label.replace(/s$/, "")}`, icon: "+", group: "CREATE",
       action: () => navigate(`/${key}/new`),
@@ -327,6 +333,13 @@ export default function App() {
     <div className={`flex min-h-screen font-sans ${darkMode ? "" : "light"}`} style={{ background: theme.bg, color: theme.text }}>
       <Sidebar navigate={navigate} theme={theme} />
 
+      {/* Mobile menu button (visible only on small screens when sidebar is closed) */}
+      {!useUIStore.getState().sidebarOpen && (
+        <button className="mobile-menu-btn" onClick={() => useUIStore.getState().setSidebarOpen(true)} title="Open menu">
+          {"\u{2630}"}
+        </button>
+      )}
+
       <div className="flex-1 min-w-0 flex flex-col">
         <div ref={contentRef} className="flex-1 overflow-y-auto" style={{ maxHeight: "calc(100vh - 32px)" }}>
           <Breadcrumb theme={theme} />
@@ -339,6 +352,7 @@ export default function App() {
             <Route path="/export" element={<ExportPanel theme={theme} toast={toast} />} />
             <Route path="/share" element={<ProGate feature="shareLinks" theme={theme}><SharePanel theme={theme} toast={toast} /></ProGate>} />
             <Route path="/upgrade" element={<ProUpgrade theme={theme} />} />
+            <Route path="/settings" element={<SettingsPage theme={theme} />} />
             <Route path="/progress" element={<ProgressDashboard navigate={navigate} theme={theme} />} />
             <Route path="/calendar" element={<CalendarView navigate={navigate} theme={theme} />} />
             <Route path="/workspace/:view" element={<WorkspacePage />} />

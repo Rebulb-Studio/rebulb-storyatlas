@@ -19,7 +19,18 @@ interface Props {
 export default function EntryDetail({ collection, item, allEntries, onEdit, onDelete, onBack, onViewEntry, theme: t }: Props) {
   const [showHistory, setShowHistory] = useState(false);
   const cfg = COLLECTION_DEFS[collection];
-  if (!cfg || !item) return null;
+  if (!cfg || !item) {
+    return (
+      <div style={{ padding: "3rem 2rem", textAlign: "center" }}>
+        <div style={{ fontSize: "2.5rem", opacity: 0.4, marginBottom: "1rem" }}>{"\u{1F50D}"}</div>
+        <h2 style={{ fontFamily: "'Playfair Display', serif", color: t.textBright, marginBottom: "0.5rem" }}>Entry Not Found</h2>
+        <p style={{ color: t.textMuted, fontSize: "0.9rem", marginBottom: "1.5rem" }}>This entry may have been deleted or the link is invalid.</p>
+        <button onClick={onBack} style={{ background: t.accentDim, border: `1px solid ${t.accent}40`, color: t.accent, padding: "0.5rem 1.2rem", borderRadius: "20px", cursor: "pointer", fontSize: "0.85rem", fontWeight: 600, fontFamily: "'DM Sans', sans-serif" }}>
+          {"←"} Go Back
+        </button>
+      </div>
+    );
+  }
 
   const pillBtn = (color: string) => ({
     background: color + "18", border: `1px solid ${color}40`, color,
