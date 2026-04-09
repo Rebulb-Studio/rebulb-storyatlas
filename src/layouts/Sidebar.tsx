@@ -4,6 +4,8 @@ import { useDataStore } from "../stores/useDataStore";
 import { useUIStore } from "../stores/useUIStore";
 import { useProjectStore } from "../stores/useProjectStore";
 import { COLLECTION_DEFS, NAV_GROUPS, WORKSPACE_SECTIONS, PUBLISH_SECTIONS, Z_INDEX } from "../constants";
+import { useProStore } from "../stores/useProStore";
+import SupportBanner from "../components/SupportBanner";
 import type { Theme, Entry } from "../types";
 
 function NavItem({ label, icon, color, count, active, onClick, theme: t }: {
@@ -64,13 +66,13 @@ export default function Sidebar({ navigate, theme: t }: { navigate: (path: strin
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <button onClick={() => setSidebarOpen(!sidebarOpen)}
           style={{ background: "transparent", border: "none", color: t.textDim, padding: "1rem", cursor: "pointer", fontSize: "1.1rem", fontFamily: "inherit" }}>
-          {sidebarOpen ? "\u25C1" : "\u25B7"}
+          {sidebarOpen ? "<" : ">"}
         </button>
         {sidebarOpen && (
           <button onClick={toggleDarkMode}
             style={{ background: "transparent", border: "none", color: t.textDim, padding: "0.5rem 1rem", cursor: "pointer", fontSize: "1rem" }}
             title={darkMode ? "Light mode" : "Dark mode"}>
-            {darkMode ? "\u2600\uFE0F" : "\u{1F319}"}
+            {darkMode ? "\u{2600}\uFE0F" : "\u{1F319}"}
           </button>
         )}
       </div>
@@ -134,6 +136,19 @@ export default function Sidebar({ navigate, theme: t }: { navigate: (path: strin
                 theme={t} />
             ))}
           </div>
+
+          {/* Pro Upgrade */}
+          {!useProStore.getState().isPro && (
+            <div style={{ marginTop: "0.75rem" }}>
+              <NavItem label="Upgrade to Pro" icon={"\u{2B50}"} color="#f59e0b"
+                active={currentPath === "/upgrade"}
+                onClick={() => navigate("/upgrade")}
+                theme={t} />
+            </div>
+          )}
+
+          {/* Support Banner */}
+          <SupportBanner theme={t} />
         </div>
       )}
     </div>

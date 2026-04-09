@@ -12,10 +12,12 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
-from flask import Flask, jsonify, render_template, request, send_file, Response
+from flask import Flask, jsonify, request, send_file, Response
+from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
 BASE_DIR = Path(__file__).resolve().parent
+DIST_DIR = BASE_DIR.parent / 'dist'
 DB_PATH = BASE_DIR / 'worldforge.db'
 BACKUP_DIR = BASE_DIR / 'backups'
 
@@ -141,18 +143,37 @@ def import_payload_into_db(conn: sqlite3.Connection, payload: dict[str, Any]) ->
 
 
 def create_app() -> Flask:
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        static_folder=str(DIST_DIR),
+        static_url_path='',
+    )
     secret = os.environ.get('WORLDFORGE_SECRET_KEY')
     if not secret:
         secret = os.urandom(32).hex()
-        logger.warning('WORLDFORGE_SECRET_KEY not set — using random key (sessions will not persist across restarts)')
+        logger.warning(
+            'WORLDFORGE_SECRET_KEY not set'
+            ' — using random key'
+        )
     app.config['SECRET_KEY'] = secret
-    app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50 MB upload limit
+    app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
+    # CORS for split-deployment (optional env var)
+    cors_origin = os.environ.get('CORS_ORIGIN')
+    if cors_origin:
+        CORS(app, origins=[cors_origin])
+    else:
+        CORS(app)
     init_db()
 
     @app.route('/')
-    def index() -> str:
-        return render_template('index.html')
+    def index():
+        if (DIST_DIR / 'index.html').is_file():
+            return send_file(DIST_DIR / 'index.html')
+        return jsonify({
+            'status': 'ok',
+            'message': 'StoryAtlas API running. '
+            'Build the frontend with npm run build.',
+        })
 
     @app.route('/api/all')
     def api_all():
@@ -820,6 +841,16 @@ def create_app() -> Flask:
         except json.JSONDecodeError:
             return jsonify({'error': 'Corrupted share data'}), 500
 
+    # ── Catch-all: serve frontend for client-side routing ────
+    @app.route('/<path:path>')
+    def catch_all(path: str):
+        file_path = DIST_DIR / path
+        if file_path.is_file():
+            return send_file(file_path)
+        if (DIST_DIR / 'index.html').is_file():
+            return send_file(DIST_DIR / 'index.html')
+        return jsonify({'error': 'Not found'}), 404
+
     return app
 
 
@@ -1190,4 +1221,8 @@ def build_world_bible_html(data: dict[str, Any]) -> str:
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(debug=os.environ.get('FLASK_DEBUG', 'false').lower() == 'true')
+    port = int(os.environ.get('PORT', 5000))
+    debug = os.environ.get(
+        'FLASK_DEBUG', 'false'
+    ).lower() == 'true'
+    app.run(host='0.0.0.0', port=port, debug=debug)

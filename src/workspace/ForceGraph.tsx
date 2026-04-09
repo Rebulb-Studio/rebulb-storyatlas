@@ -165,7 +165,7 @@ export default function ForceGraph({ data, onView, theme: t }: {
 
     node.append("circle").attr("r", 20).attr("fill", (d) => d.color).attr("fill-opacity", 0.15).attr("stroke", (d) => d.color).attr("stroke-width", 1.5);
     node.append("circle").attr("r", 6).attr("fill", (d) => d.color);
-    node.append("text").attr("y", 32).attr("text-anchor", "middle").attr("fill", t.textMuted).attr("font-size", "9px").attr("font-family", "'DM Sans', sans-serif").text((d) => d.label.length > 18 ? d.label.slice(0, 16) + "\u2026" : d.label);
+    node.append("text").attr("y", 32).attr("text-anchor", "middle").attr("fill", t.textMuted).attr("font-size", "9px").attr("font-family", "'DM Sans', sans-serif").text((d) => d.label.length > 18 ? d.label.slice(0, 16) + "\…" : d.label);
 
     simulation.on("tick", () => {
       link.attr("x1", (d) => (d.source as GraphNode).x!).attr("y1", (d) => (d.source as GraphNode).y!)

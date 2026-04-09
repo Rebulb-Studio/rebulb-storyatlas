@@ -44,7 +44,7 @@ function MenuBar({ editor, theme: t }: { editor: ReturnType<typeof useEditor>; t
       <button type="button" onClick={() => editor.chain().focus().toggleBlockquote().run()} style={btn(editor.isActive("blockquote"))} title="Quote">{"\u201C"}</button>
       <div style={{ width: "1px", background: t.border, margin: "0 0.15rem" }} />
       <button type="button" onClick={() => editor.chain().focus().toggleCodeBlock().run()} style={btn(editor.isActive("codeBlock"))} title="Code Block">{"{}"}</button>
-      <button type="button" onClick={() => editor.chain().focus().setHorizontalRule().run()} style={btn(false)} title="Divider">{"\u2014"}</button>
+      <button type="button" onClick={() => editor.chain().focus().setHorizontalRule().run()} style={btn(false)} title="Divider">{"\—"}</button>
       <div style={{ width: "1px", background: t.border, margin: "0 0.15rem" }} />
       <button type="button" onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} style={{ ...btn(false), opacity: editor.can().undo() ? 1 : 0.3 }} title="Undo">{"\u21A9"}</button>
       <button type="button" onClick={() => editor.chain().focus().redo().run()} disabled={!editor.can().redo()} style={{ ...btn(false), opacity: editor.can().redo() ? 1 : 0.3 }} title="Redo">{"\u21AA"}</button>

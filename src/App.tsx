@@ -30,6 +30,8 @@ import ExportPanel from "./components/ExportPanel";
 import SharePanel from "./components/SharePanel";
 import ProgressDashboard from "./components/ProgressDashboard";
 import CalendarView from "./components/CalendarView";
+import ProUpgrade from "./components/ProUpgrade";
+import ProGate from "./components/ProGate";
 import SeriesListing from "./pages/SeriesListing";
 import ReaderMode from "./pages/ReaderMode";
 import SeriesDashboard from "./pages/SeriesDashboard";
@@ -302,9 +304,9 @@ export default function App() {
       id: `create:${key}`, label: `New ${cfg.label.replace(/s$/, "")}`, icon: "+", group: "CREATE",
       action: () => navigate(`/${key}/new`),
     })),
-    { id: "export:json", label: "Export JSON Backup", icon: "\u2913", group: "EXPORT", action: () => { api.exportJSON(); toast("JSON export started", "info"); } },
-    { id: "export:zip", label: "Export ZIP Package", icon: "\u2913", group: "EXPORT", action: () => { api.exportZIP(); toast("ZIP export started", "info"); } },
-    { id: "toggle:dark", label: darkMode ? "Switch to Light Mode" : "Switch to Dark Mode", icon: darkMode ? "\u2600" : "\u263E", group: "SETTINGS", action: () => useUIStore.getState().toggleDarkMode() },
+    { id: "export:json", label: "Export JSON Backup", icon: "\u{2B07}\uFE0F", group: "EXPORT", action: () => { api.exportJSON(); toast("JSON export started", "info"); } },
+    { id: "export:zip", label: "Export ZIP Package", icon: "\u{2B07}\uFE0F", group: "EXPORT", action: () => { api.exportZIP(); toast("ZIP export started", "info"); } },
+    { id: "toggle:dark", label: darkMode ? "Switch to Light Mode" : "Switch to Dark Mode", icon: darkMode ? "\u{2600}\uFE0F" : "\u{1F319}", group: "SETTINGS", action: () => useUIStore.getState().toggleDarkMode() },
   ], [darkMode, navigate, toast]);
 
   if (!loaded) {
@@ -326,7 +328,8 @@ export default function App() {
             <Route path="/search" element={<SearchPage navigate={navigate} theme={theme} />} />
             <Route path="/writing-tools" element={<WritingTools theme={theme} />} />
             <Route path="/export" element={<ExportPanel theme={theme} toast={toast} />} />
-            <Route path="/share" element={<SharePanel theme={theme} toast={toast} />} />
+            <Route path="/share" element={<ProGate feature="shareLinks" theme={theme}><SharePanel theme={theme} toast={toast} /></ProGate>} />
+            <Route path="/upgrade" element={<ProUpgrade theme={theme} />} />
             <Route path="/progress" element={<ProgressDashboard navigate={navigate} theme={theme} />} />
             <Route path="/calendar" element={<CalendarView navigate={navigate} theme={theme} />} />
             <Route path="/workspace/:view" element={<WorkspacePage />} />
