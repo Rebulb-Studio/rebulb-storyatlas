@@ -51,6 +51,12 @@ export const useUIStore = create<UIState>((set, get) => ({
   toast: (message, type = "info") => {
     const id = Date.now();
     set((state) => ({ toasts: [...state.toasts, { id, message, type }] }));
+    // Phase 1: mark as exiting (triggers exit animation)
+    setTimeout(
+      () => set((state) => ({ toasts: state.toasts.map((t) => t.id === id ? { ...t, exiting: true } : t) })),
+      2700
+    );
+    // Phase 2: remove from DOM
     setTimeout(
       () => set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) })),
       3000

@@ -78,7 +78,7 @@ export default function Sidebar({ navigate, theme: t }: { navigate: (path: strin
       </div>
 
       {sidebarOpen && (
-        <div style={{ padding: "0 0.5rem", flex: 1, overflowY: "auto" }}>
+        <div className="animate-fade-in" style={{ padding: "0 0.5rem", flex: 1, overflowY: "auto" }}>
           <input placeholder="Search... (Ctrl+K)" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={(e) => { if (e.target.value === "") setCmdOpen(true); }}
             onKeyDown={(e) => { if (e.key === "Escape") { setSearchQuery(""); (e.target as HTMLInputElement).blur(); } }}

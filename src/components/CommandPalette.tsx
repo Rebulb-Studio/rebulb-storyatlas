@@ -35,8 +35,8 @@ export default function CommandPalette({ commands, onClose, theme }: {
 
   const t = theme;
   return (
-    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: Z_INDEX.commandPalette, display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: "15vh" }}>
-      <div onClick={(e) => e.stopPropagation()} style={{ width: "100%", maxWidth: "520px", background: t.bg, border: `1px solid ${t.border}`, borderRadius: "12px", boxShadow: "0 20px 60px rgba(0,0,0,0.5)", overflow: "hidden" }}>
+    <div onClick={onClose} className="animate-fade-in" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: Z_INDEX.commandPalette, display: "flex", alignItems: "flex-start", justifyContent: "center", paddingTop: "15vh" }}>
+      <div onClick={(e) => e.stopPropagation()} className="animate-scale-in" style={{ width: "100%", maxWidth: "520px", background: t.bg, border: `1px solid ${t.border}`, borderRadius: "12px", boxShadow: "0 20px 60px rgba(0,0,0,0.5)", overflow: "hidden" }}>
         <input ref={inputRef} value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={onKey}
           placeholder="Type a command or search..."
           style={{ width: "100%", padding: "0.9rem 1.2rem", background: "transparent", border: "none", borderBottom: `1px solid ${t.border}`, color: t.text, fontSize: "0.95rem", fontFamily: "'DM Sans',sans-serif", outline: "none" }}

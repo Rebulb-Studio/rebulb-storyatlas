@@ -43,8 +43,8 @@ export default function VersionHistory({ collection, entryId, onRestore, onClose
   });
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 6000, display: "flex", alignItems: "center", justifyContent: "center" }} onClick={onClose}>
-      <div onClick={(e) => e.stopPropagation()} style={{ background: t.bg, border: `1px solid ${t.border}`, borderRadius: "12px", width: "90%", maxWidth: "700px", maxHeight: "80vh", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+    <div className="animate-fade-in" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 6000, display: "flex", alignItems: "center", justifyContent: "center" }} onClick={onClose}>
+      <div onClick={(e) => e.stopPropagation()} className="animate-scale-in" style={{ background: t.bg, border: `1px solid ${t.border}`, borderRadius: "12px", width: "90%", maxWidth: "700px", maxHeight: "80vh", overflow: "hidden", display: "flex", flexDirection: "column" }}>
         <div style={{ padding: "1rem 1.25rem", borderBottom: `1px solid ${t.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <h3 style={{ fontFamily: "'Playfair Display', serif", color: t.textBright, margin: 0 }}>Version History</h3>
           <button onClick={onClose} style={pillBtn(t.textDim)}>Close</button>
