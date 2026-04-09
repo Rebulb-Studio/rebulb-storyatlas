@@ -13,13 +13,13 @@ export const FORMAT_PRESETS: Record<string, FormatPreset> = {
 
 // ─── Outline Methods ──────────────────────────────────────────────────
 export const OUTLINE_METHODS: OutlineMethod[] = [
-  { id: "threeAct", label: "Three-Act Structure", desc: "Setup \→ Confrontation \→ Resolution", beats: ["Hook","Inciting Incident","First Plot Point","Rising Action","Midpoint","Crisis","Climax","Falling Action","Resolution"] },
-  { id: "kishotenketsu", label: "Kish\ōtenketsu", desc: "Introduction \→ Development \→ Twist \→ Conclusion (no central conflict required)", beats: ["Ki (Introduction)","Sh\ō (Development)","Ten (Twist/Complication)","Ketsu (Conclusion)"] },
+  { id: "threeAct", label: "Three-Act Structure", desc: "Setup → Confrontation → Resolution", beats: ["Hook","Inciting Incident","First Plot Point","Rising Action","Midpoint","Crisis","Climax","Falling Action","Resolution"] },
+  { id: "kishotenketsu", label: "Kishōtenketsu", desc: "Introduction → Development → Twist → Conclusion (no central conflict required)", beats: ["Ki (Introduction)","Shō (Development)","Ten (Twist/Complication)","Ketsu (Conclusion)"] },
   { id: "saveTheCat", label: "Save the Cat!", desc: "15-beat structure for compelling narrative pacing", beats: ["Opening Image","Theme Stated","Setup","Catalyst","Debate","Break into Two","B Story","Fun and Games","Midpoint","Bad Guys Close In","All Is Lost","Dark Night of Soul","Break into Three","Finale","Final Image"] },
   { id: "heros", label: "Hero's Journey", desc: "Campbell/Vogler monomyth", beats: ["Ordinary World","Call to Adventure","Refusal","Meeting the Mentor","Crossing the Threshold","Tests, Allies, Enemies","Approach","Ordeal","Reward","The Road Back","Resurrection","Return with Elixir"] },
   { id: "snowflake", label: "Snowflake Method", desc: "Fractal expansion from sentence to full outline", beats: ["One-Sentence Summary","One-Paragraph Summary","Character Summaries","Expand to Full Page","Character Synopses","Expand to 4 Pages","Character Charts","Scene List","Scene Details"] },
-  { id: "sevenPoint", label: "Seven-Point Story", desc: "Dan Wells method \— work backwards from resolution", beats: ["Hook","Plot Turn 1","Pinch Point 1","Midpoint","Pinch Point 2","Plot Turn 2","Resolution"] },
-  { id: "fichtean", label: "Fichtean Curve", desc: "Start in crisis \— no slow setup, immediate tension", beats: ["Crisis 1 (Opening)","Rising Crises","Crisis Escalation","Climax","Falling Action"] },
+  { id: "sevenPoint", label: "Seven-Point Story", desc: "Dan Wells method — work backwards from resolution", beats: ["Hook","Plot Turn 1","Pinch Point 1","Midpoint","Pinch Point 2","Plot Turn 2","Resolution"] },
+  { id: "fichtean", label: "Fichtean Curve", desc: "Start in crisis — no slow setup, immediate tension", beats: ["Crisis 1 (Opening)","Rising Crises","Crisis Escalation","Climax","Falling Action"] },
 ];
 
 export const SCENE_TYPES = ["Action","Dialogue","Exposition","Flashback","Dream","Training","Battle","Revelation","Romance","Aftermath","Travel","Political","Ritual","Transformation","Death","Reunion","Betrayal","Escape","Investigation","Duel"];
@@ -215,7 +215,7 @@ export const COLLECTION_DEFS: Record<string, CollectionDef> = {
       { k:"type", l:"Type", t:"select", opts:["Main Plot","Subplot","Character Arc","Romance Arc","Mystery","Revenge","Political","War","Training","Tournament","Heist","Redemption","Tragedy","Coming of Age","Other"] },
       { k:"status", l:"Status", t:"select", opts:["Planned","In Progress","Complete","Abandoned","Reworking"] },
       { k:"volume", l:"Volume / Part", t:"text" },
-      { k:"method", l:"Structure Method", t:"select", opts:["Three-Act","Kish\ōtenketsu","Save the Cat","Hero's Journey","Snowflake","Seven-Point","Fichtean","Custom"] },
+      { k:"method", l:"Structure Method", t:"select", opts:["Three-Act","Kishōtenketsu","Save the Cat","Hero's Journey","Snowflake","Seven-Point","Fichtean","Custom"] },
       { k:"synopsis", l:"Synopsis", t:"textarea" },
       { k:"conflict", l:"Central Conflict", t:"textarea" },
       { k:"stakes", l:"Stakes", t:"textarea" },

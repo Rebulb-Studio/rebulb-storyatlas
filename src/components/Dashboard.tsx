@@ -133,7 +133,7 @@ export default function Dashboard({ navigate, theme: t }: Props) {
       {/* Project Header */}
       <div style={{ marginBottom: "2rem" }}>
         <div style={{ fontSize: "0.7rem", color: t.accent, letterSpacing: "0.15em", textTransform: "uppercase", fontWeight: 700, marginBottom: "0.5rem" }}>
-          {"Rebulb Studio \· Creative Workspace"}
+          {"Rebulb Studio · Creative Workspace"}
         </div>
         <input
           value={meta.projectName}
@@ -366,7 +366,7 @@ export default function Dashboard({ navigate, theme: t }: Props) {
               <summary style={{ cursor: "pointer", fontWeight: 600, color: t.text, fontSize: "0.85rem" }}>
                 {m.label}{" "}
                 <span style={{ color: t.textDim, fontWeight: 400 }}>
-                  {"\—"} {m.desc}
+                  {"—"} {m.desc}
                 </span>
               </summary>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "0.3rem", marginTop: "0.5rem" }}>

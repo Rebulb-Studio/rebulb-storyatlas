@@ -11,7 +11,7 @@ export default function Onboarding({ theme: t }: { theme: Theme }) {
   if (!showOnboarding) return null;
 
   const steps = [
-    { title: "Welcome to Rebulb Studio", body: "Your creative worldbuilding workspace. Track characters, locations, magic systems, plot outlines, and more \— all in one place." },
+    { title: "Welcome to Rebulb Studio", body: "Your creative worldbuilding workspace. Track characters, locations, magic systems, plot outlines, and more — all in one place." },
     { title: "Name Your Project", body: "Give your project a name to get started.", hasInput: true },
     { title: "You're All Set!", body: "Start creating entries, explore the workspace views, or press Ctrl+K for the command palette." },
   ];

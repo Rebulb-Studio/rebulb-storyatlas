@@ -142,7 +142,7 @@ export default function CollectionList({ collection, items, filterText, onFilter
                     <div style={{ height: "100%", width: `${comp}%`, background: comp > 60 ? t.success : comp > 30 ? "#f59e0b" : t.danger, borderRadius: "2px" }} />
                   </div>
                   <span style={{ color: t.textDim, fontSize: "0.65rem" }}>{comp}%</span>
-                  <span style={{ color: t.textDim, fontSize: "0.9rem" }}>{"\→"}</span>
+                  <span style={{ color: t.textDim, fontSize: "0.9rem" }}>{"→"}</span>
                 </div>
               </button>
             );

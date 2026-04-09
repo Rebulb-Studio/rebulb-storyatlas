@@ -137,6 +137,14 @@ export default function Sidebar({ navigate, theme: t }: { navigate: (path: strin
             ))}
           </div>
 
+          {/* Settings */}
+          <div style={{ marginTop: "0.75rem" }}>
+            <NavItem label="Settings" icon={"\u{2699}\uFE0F"} color={t.textMuted}
+              active={currentPath === "/settings"}
+              onClick={() => navigate("/settings")}
+              theme={t} />
+          </div>
+
           {/* Pro Upgrade */}
           {!useProStore.getState().isPro && (
             <div style={{ marginTop: "0.75rem" }}>

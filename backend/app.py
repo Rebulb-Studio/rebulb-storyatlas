@@ -145,8 +145,7 @@ def import_payload_into_db(conn: sqlite3.Connection, payload: dict[str, Any]) ->
 def create_app() -> Flask:
     app = Flask(
         __name__,
-        static_folder=str(DIST_DIR),
-        static_url_path='',
+        static_folder=None,
     )
     secret = os.environ.get('WORLDFORGE_SECRET_KEY')
     if not secret:

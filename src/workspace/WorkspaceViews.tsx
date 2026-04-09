@@ -46,10 +46,10 @@ export function WorldBible({ data, projectMeta, onNavigate, theme: t }: {
   return (
     <div style={{ padding: "1.5rem" }}>
       <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: t.textBright, marginBottom: "0.5rem" }}>
-        {projectMeta.projectName || "Rebulb Studio"} {"\—"} World Bible
+        {projectMeta.projectName || "Rebulb Studio"} {"—"} World Bible
       </h2>
       <p style={{ color: t.textMuted, fontSize: "0.85rem", marginBottom: "1.5rem" }}>
-        {projectMeta.genre && `${projectMeta.genre} \· `}{estimateTotalWords(data, projectMeta.scratchpad || "").toLocaleString()} words estimated
+        {projectMeta.genre && `${projectMeta.genre} · `}{estimateTotalWords(data, projectMeta.scratchpad || "").toLocaleString()} words estimated
       </p>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px,1fr))", gap: "0.75rem" }}>
         {coverageRows.map((row) => (
@@ -146,7 +146,7 @@ export function StoryCanvas({ data, projectMeta, onView, onUpdateMeta, theme: t 
                 {colNotes.map((note) => (
                   <div key={note.id} style={{ background: `${t.accent}12`, border: `1px solid ${t.accent}25`, borderRadius: "4px", padding: "0.5rem", fontSize: "0.78rem", color: t.accent, display: "flex", justifyContent: "space-between" }}>
                     <span>{note.text}</span>
-                    <button onClick={() => removeNote(note.id)} style={{ background: "none", border: "none", color: t.danger, cursor: "pointer", fontSize: "0.7rem", padding: 0 }}>{"\×"}</button>
+                    <button onClick={() => removeNote(note.id)} style={{ background: "none", border: "none", color: t.danger, cursor: "pointer", fontSize: "0.7rem", padding: 0 }}>{"×"}</button>
                   </div>
                 ))}
               </div>
@@ -264,7 +264,7 @@ export function CanonGraph({ data, onView, theme: t }: {
             const from = nodeMap[e.from], to = nodeMap[e.to];
             return (
               <div key={i} style={{ fontSize: "0.75rem", color: t.textMuted, padding: "0.3rem 0.5rem", background: t.surface, borderRadius: "4px" }}>
-                <strong>{from?.label}</strong> {"\→"} <strong>{to?.label}</strong> <span style={{ color: t.textDim }}>({e.label})</span>
+                <strong>{from?.label}</strong> {"→"} <strong>{to?.label}</strong> <span style={{ color: t.textDim }}>({e.label})</span>
               </div>
             );
           })}
