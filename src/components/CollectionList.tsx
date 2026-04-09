@@ -119,12 +119,13 @@ export default function CollectionList({ collection, items, filterText, onFilter
         </div>
       ) : (
         <div style={{ display: "grid", gap: "0.5rem", marginTop: "0.75rem" }}>
-          {filtered.map((item) => {
+          {filtered.map((item, index) => {
             const comp = getCompleteness(collection, item);
             const snippet = cfg.fields?.filter((f) => f.t === "textarea" && item[f.k]).map((f) => item[f.k] as string)[0] || "";
             return (
               <button key={item.id} onClick={() => bulkMode ? toggleSelect(item.id) : onView(item)}
-                style={{ background: selected.has(item.id) ? t.accentDim : t.surface, border: `1px solid ${selected.has(item.id) ? t.accent + "40" : t.border}`, borderRadius: "8px", padding: "0.85rem 1rem", cursor: "pointer", textAlign: "left", display: "flex", justifyContent: "space-between", alignItems: "center", transition: "all 0.15s", fontFamily: "inherit", color: "inherit" }}
+                className="hover-lift animate-slide-up"
+                style={{ background: selected.has(item.id) ? t.accentDim : t.surface, border: `1px solid ${selected.has(item.id) ? t.accent + "40" : t.border}`, borderRadius: "8px", padding: "0.85rem 1rem", cursor: "pointer", textAlign: "left", display: "flex", justifyContent: "space-between", alignItems: "center", fontFamily: "inherit", color: "inherit", animationDelay: `${index * 30}ms` }}
                 onMouseEnter={(e) => (e.currentTarget.style.background = t.surfaceHover)}
                 onMouseLeave={(e) => (e.currentTarget.style.background = t.surface)}>
                 <div style={{ flex: 1, minWidth: 0 }}>

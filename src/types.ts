@@ -47,6 +47,7 @@ export interface Toast {
   id: number;
   message: string;
   type: "info" | "success" | "error";
+  exiting?: boolean;
 }
 
 export type SaveStatus = "idle" | "saving" | "saved" | "error";

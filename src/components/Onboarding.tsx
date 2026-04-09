@@ -30,8 +30,8 @@ export default function Onboarding({ theme: t }: { theme: Theme }) {
   });
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: Z_INDEX.onboarding, display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ background: t.bg, border: `1px solid ${t.border}`, borderRadius: "16px", padding: "2rem", maxWidth: "440px", width: "90%" }}>
+    <div className="animate-fade-in" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: Z_INDEX.onboarding, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div className="animate-scale-in" style={{ background: t.bg, border: `1px solid ${t.border}`, borderRadius: "16px", padding: "2rem", maxWidth: "440px", width: "90%" }}>
         <h2 style={{ fontFamily: "'Playfair Display',serif", color: t.textBright, marginBottom: "0.75rem" }}>{step.title}</h2>
         <p style={{ color: t.textMuted, lineHeight: 1.6, marginBottom: "1rem" }}>{step.body}</p>
         {step.hasInput && (

@@ -9,7 +9,7 @@ export default function ToastStack({ theme: t }: { theme: Theme }) {
   return (
     <div style={{ position: "fixed", bottom: "48px", right: "16px", display: "grid", gap: "0.4rem", zIndex: Z_INDEX.toast }}>
       {toasts.map((toast) => (
-        <div key={toast.id} style={{
+        <div key={toast.id} className={toast.exiting ? "animate-slide-out-right" : "animate-slide-in-right"} style={{
           background: toast.type === "error" ? `${t.danger}20` : toast.type === "success" ? `${t.success}20` : t.surface,
           border: `1px solid ${toast.type === "error" ? t.danger : toast.type === "success" ? t.success : t.border}40`,
           color: toast.type === "error" ? t.danger : toast.type === "success" ? t.success : t.text,

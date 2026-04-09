@@ -17,7 +17,12 @@ import StatusBar from "./components/StatusBar";
 import CommandPalette from "./components/CommandPalette";
 import Onboarding from "./components/Onboarding";
 import ToastStack from "./components/ToastStack";
+import PageTransition from "./components/PageTransition";
+import Breadcrumb from "./components/Breadcrumb";
+import LoadingSpinner from "./components/LoadingSpinner";
 import Dashboard from "./components/Dashboard";
+import { useDocumentTitle } from "./hooks/useDocumentTitle";
+import { useScrollToTop } from "./hooks/useScrollToTop";
 import CollectionList from "./components/CollectionList";
 import EntryDetail from "./components/EntryDetail";
 import EntryForm from "./components/EntryForm";
@@ -32,6 +37,7 @@ import ProgressDashboard from "./components/ProgressDashboard";
 import CalendarView from "./components/CalendarView";
 import ProUpgrade from "./components/ProUpgrade";
 import ProGate from "./components/ProGate";
+import HomePage from "./pages/HomePage";
 import SeriesListing from "./pages/SeriesListing";
 import ReaderMode from "./pages/ReaderMode";
 import SeriesDashboard from "./pages/SeriesDashboard";
@@ -309,12 +315,12 @@ export default function App() {
     { id: "toggle:dark", label: darkMode ? "Switch to Light Mode" : "Switch to Dark Mode", icon: darkMode ? "\u{2600}\uFE0F" : "\u{1F319}", group: "SETTINGS", action: () => useUIStore.getState().toggleDarkMode() },
   ], [darkMode, navigate, toast]);
 
+  const contentRef = useRef<HTMLDivElement>(null);
+  useDocumentTitle();
+  useScrollToTop(contentRef);
+
   if (!loaded) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-bg text-text-muted font-sans">
-        Loading workspace...
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
@@ -322,9 +328,12 @@ export default function App() {
       <Sidebar navigate={navigate} theme={theme} />
 
       <div className="flex-1 min-w-0 flex flex-col">
-        <div className="flex-1 overflow-y-auto" style={{ maxHeight: "calc(100vh - 32px)" }}>
+        <div ref={contentRef} className="flex-1 overflow-y-auto" style={{ maxHeight: "calc(100vh - 32px)" }}>
+          <Breadcrumb theme={theme} />
+          <PageTransition>
           <Routes>
-            <Route path="/" element={<Dashboard navigate={navigate} theme={theme} />} />
+            <Route path="/" element={<HomePage navigate={navigate} theme={theme} />} />
+            <Route path="/dashboard" element={<Dashboard navigate={navigate} theme={theme} />} />
             <Route path="/search" element={<SearchPage navigate={navigate} theme={theme} />} />
             <Route path="/writing-tools" element={<WritingTools theme={theme} />} />
             <Route path="/export" element={<ExportPanel theme={theme} toast={toast} />} />
@@ -339,6 +348,7 @@ export default function App() {
             <Route path="/:collection/:id" element={<EntryDetailPage />} />
             <Route path="/:collection/:id/edit" element={<EntryFormPage />} />
           </Routes>
+          </PageTransition>
         </div>
         <StatusBar theme={theme} />
       </div>
