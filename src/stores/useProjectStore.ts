@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { ProjectMeta } from "../types";
 import * as api from "../api";
-import { saveMetaToLocal } from "./useDataStore";
+import { saveMetaToLocal, loadMetaFromLocal } from "./useDataStore";
 
 interface ProjectState {
   meta: ProjectMeta;
@@ -22,9 +22,15 @@ const DEFAULT_META: ProjectMeta = {
   author: "",
 };
 
+// ─── Synchronous initialization from localStorage ──────────
+const cachedMeta = loadMetaFromLocal();
+const initialMeta: ProjectMeta = cachedMeta
+  ? { ...DEFAULT_META, ...(cachedMeta as Partial<ProjectMeta>) }
+  : DEFAULT_META;
+
 export const useProjectStore = create<ProjectState>((set, get) => ({
-  meta: DEFAULT_META,
-  scratchpadText: "",
+  meta: initialMeta,
+  scratchpadText: localStorage.getItem("sa_scratchpad_local") || "",
   promptIndex: Math.floor(Math.random() * 10),
 
   setMeta: (updates) =>

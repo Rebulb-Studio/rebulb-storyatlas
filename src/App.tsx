@@ -248,30 +248,25 @@ function PublishPage() {
 // ─── Main App ────────────────────────────────────────────────────────
 export default function App() {
   const navigate = useNavigate();
-  const { data, loaded, loadAll, setData } = useDataStore();
+  const { data, loaded } = useDataStore();
   const { darkMode, cmdOpen, setCmdOpen, toast, showOnboarding } = useUIStore();
   const { meta, setMeta, setScratchpadText } = useProjectStore();
   const theme: Theme = darkMode ? DARK_THEME : LIGHT_THEME;
 
-  // ─── Load data on mount (backend → localStorage fallback) ──
+  // ─── Background sync with backend ────────────────────────────
+  // Data is already loaded from localStorage synchronously in the stores.
+  // This effect just tries to sync with the backend in the background.
   useEffect(() => {
     (async () => {
-      const loadedMeta = await useDataStore.getState().loadAll();
-      if (loadedMeta) {
+      const loadedMeta = await useDataStore.getState().syncWithBackend();
+      // If backend returned fresher meta, update the project store
+      if (loadedMeta && useDataStore.getState().backendOnline) {
         setMeta(loadedMeta as Record<string, unknown>);
         if ((loadedMeta as Record<string, unknown>).scratchpad) {
           setScratchpadText((loadedMeta as Record<string, unknown>).scratchpad as string);
         }
       }
-      // Restore scratchpad from local backup
-      const localScratch = localStorage.getItem("sa_scratchpad_local");
-      if (localScratch && !useProjectStore.getState().scratchpadText) {
-        setScratchpadText(localScratch);
-      }
-      const { backendOnline } = useDataStore.getState();
-      if (!backendOnline) {
-        toast("Offline mode — your work is saved locally and will sync when the backend is available.", "info");
-      }
+      // Show onboarding for brand new projects (no cache, no backend data)
       const allData = useDataStore.getState().data;
       const totalEntries = Object.values(allData).reduce(
         (s: number, arr) => s + (Array.isArray(arr) ? arr.length : 0), 0
