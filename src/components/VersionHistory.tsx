@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import * as api from "../api";
 import type { Theme, Entry } from "../types";
 
 interface Version {
@@ -21,18 +22,18 @@ export default function VersionHistory({ collection, entryId, onRestore, onClose
   const [selected, setSelected] = useState<Version | null>(null);
 
   useEffect(() => {
-    fetch(`/api/${collection}/${entryId}/history`)
-      .then((r) => r.json())
+    api.getVersionHistory(collection, entryId)
       .then((data) => { setVersions(data); setLoading(false); })
       .catch(() => setLoading(false));
   }, [collection, entryId]);
 
   const restore = async (v: Version) => {
     if (!confirm(`Restore to version from ${v.createdAt}? Current state will be saved as a version.`)) return;
-    const res = await fetch(`/api/${collection}/${entryId}/restore/${v.versionId}`, { method: "POST" });
-    if (res.ok) {
-      const restored = await res.json();
+    try {
+      const restored = await api.restoreVersion(collection, entryId, v.versionId);
       onRestore(restored);
+    } catch (err) {
+      console.error("Failed to restore version:", err);
     }
   };
 

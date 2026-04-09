@@ -80,7 +80,7 @@ export default function SettingsPage({ theme: t }: Props) {
   const isPro = useProStore((s) => s.isPro);
   const activateKey = useProStore((s) => s.activateKey);
   const deactivate = useProStore((s) => s.deactivate);
-  const loadAll = useDataStore((s) => s.loadAll);
+  const syncWithBackend = useDataStore((s) => s.syncWithBackend);
 
   const [proKeyInput, setProKeyInput] = useState("");
   const dailyWordGoal =
@@ -297,7 +297,7 @@ export default function SettingsPage({ theme: t }: Props) {
                 if (!file) return;
                 try {
                   await importFile(file);
-                  await loadAll();
+                  await syncWithBackend();
                   toast("File imported successfully", "success");
                 } catch {
                   toast("Import failed", "error");
@@ -326,7 +326,7 @@ export default function SettingsPage({ theme: t }: Props) {
                 )
               ) {
                 importJSON({})
-                  .then(() => loadAll())
+                  .then(() => syncWithBackend())
                   .then(() => toast("All data has been reset", "success"))
                   .catch(() => toast("Reset failed", "error"));
               }

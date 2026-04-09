@@ -13,6 +13,12 @@ export default function TagInput({ value, onChange, allTags = [], theme: t }: Pr
   const [input, setInput] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const blurTimer = useRef<ReturnType<typeof setTimeout>>(null);
+
+  // Cleanup blur timer on unmount
+  useEffect(() => {
+    return () => { if (blurTimer.current) clearTimeout(blurTimer.current); };
+  }, []);
 
   const suggestions = input.trim()
     ? allTags.filter((tag) => tag.toLowerCase().includes(input.toLowerCase()) && !tags.includes(tag)).slice(0, 8)
@@ -66,7 +72,7 @@ export default function TagInput({ value, onChange, allTags = [], theme: t }: Pr
           onChange={(e) => { setInput(e.target.value); setShowSuggestions(true); }}
           onKeyDown={onKeyDown}
           onFocus={() => setShowSuggestions(true)}
-          onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+          onBlur={() => { if (blurTimer.current) clearTimeout(blurTimer.current); blurTimer.current = setTimeout(() => setShowSuggestions(false), 200); }}
           placeholder={tags.length ? "" : "Add tags..."}
           style={{
             flex: 1, minWidth: "80px", background: "transparent", border: "none", outline: "none",

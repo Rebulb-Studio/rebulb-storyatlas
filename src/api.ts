@@ -81,6 +81,7 @@ export async function updateMeta(
 
 export async function exportJSON(): Promise<void> {
   const res = await fetch(`${API}/export.json`);
+  if (!res.ok) throw new Error(`Export failed: ${res.status}`);
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -92,6 +93,7 @@ export async function exportJSON(): Promise<void> {
 
 export async function exportZIP(): Promise<void> {
   const res = await fetch(`${API}/export.zip`);
+  if (!res.ok) throw new Error(`Export failed: ${res.status}`);
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -233,4 +235,73 @@ export async function createShareLink(): Promise<{ token: string }> {
 export async function getSharedData(token: string): Promise<Record<string, unknown>> {
   const res = await request(`${API}/shared/${token}`);
   return res.json();
+}
+
+// ─── Version History ────────────────────────────────────────────────
+export async function getVersionHistory(
+  collection: string,
+  entryId: string
+): Promise<{ versionId: number; data: Entry; createdAt: string }[]> {
+  const res = await request(`${API}/${collection}/${entryId}/history`);
+  return res.json();
+}
+
+export async function restoreVersion(
+  collection: string,
+  entryId: string,
+  versionId: number
+): Promise<Entry> {
+  const res = await request(
+    `${API}/${collection}/${entryId}/restore/${versionId}`,
+    { method: "POST" }
+  );
+  return res.json();
+}
+
+// ─── AI Brainstorming Export ────────────────────────────────────────
+export async function exportAIContext(
+  sections?: string[]
+): Promise<{ content: string; projectName: string; wordCount: number }> {
+  const qs = sections?.length ? `?sections=${sections.join(",")}` : "";
+  const res = await request(`${API}/export/ai-context${qs}`);
+  return res.json();
+}
+
+// Client-side AI context generation (offline fallback)
+export function generateAIContextLocal(
+  data: Record<string, unknown[]>,
+  meta: Record<string, unknown>
+): string {
+  const lines: string[] = [];
+  lines.push(`# ${meta.projectName || "Untitled Project"} — AI Brainstorming Context\n`);
+  lines.push(`**Genre:** ${meta.genre || "Unspecified"}`);
+  lines.push(`**Format:** ${meta.format || "Novel"}`);
+  if (meta.description) lines.push(`**Description:** ${meta.description}\n`);
+
+  const addSection = (title: string, key: string, fields: string[]) => {
+    const items = (data[key] || []) as Record<string, unknown>[];
+    if (!items.length) return;
+    lines.push(`\n## ${title} (${items.length})\n`);
+    for (const item of items) {
+      const name = (item.name as string) || (item.title as string) || "Untitled";
+      lines.push(`### ${name}`);
+      for (const f of fields) {
+        const val = item[f];
+        if (val && typeof val === "string" && val.trim()) {
+          lines.push(`- **${f}:** ${val.slice(0, 500)}`);
+        }
+      }
+      lines.push("");
+    }
+  };
+
+  addSection("Characters", "characters", ["role", "archetype", "personality", "motivations", "fears", "abilities", "arcSummary", "relationships", "lies", "truth"]);
+  addSection("Locations", "locations", ["type", "region", "overview", "storySignificance"]);
+  addSection("Factions", "factions", ["type", "leader", "ideology", "goals", "overview"]);
+  addSection("Plot Arcs", "plots", ["type", "status", "synopsis", "conflict", "resolution"]);
+  addSection("Lore & Concepts", "lore", ["category", "overview", "hiddenTruth"]);
+  addSection("Power Systems", "systems", ["type", "overview", "mechanics", "costs"]);
+  addSection("Timeline Events", "timelineEvents", ["date", "type", "overview"]);
+
+  return lines.join("\n");
 }

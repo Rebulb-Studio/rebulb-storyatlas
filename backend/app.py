@@ -840,6 +840,31 @@ def create_app() -> Flask:
         except json.JSONDecodeError:
             return jsonify({'error': 'Corrupted share data'}), 500
 
+    # ─── AI Brainstorming Export ───────────────────────────────
+    @app.route('/api/export/ai-context')
+    def api_export_ai_context():
+        sections_param = request.args.get('sections', '')
+        sections = (
+            [s.strip() for s in sections_param.split(',') if s.strip()]
+            if sections_param else None
+        )
+        conn = get_connection()
+        data: dict[str, Any] = {'meta': load_meta(conn)}
+        for col in COLLECTIONS:
+            data[col] = load_collection(conn, col)
+        conn.close()
+        content = build_ai_context(data, sections)
+        word_count = len(content.split())
+        project = (
+            data['meta'].get('projectName')
+            or 'StoryAtlas Project'
+        )
+        return jsonify({
+            'content': content,
+            'projectName': project,
+            'wordCount': word_count,
+        })
+
     # ── Catch-all: serve frontend for client-side routing ────
     @app.route('/<path:path>')
     def catch_all(path: str):
@@ -1112,6 +1137,109 @@ def build_export_manifest(data: dict[str, Any]) -> dict[str, Any]:
         'counts': {collection: len(data.get(collection, [])) for collection in COLLECTIONS},
         'totalEntries': sum(len(data.get(collection, [])) for collection in COLLECTIONS),
     }
+
+
+def build_ai_context(
+    data: dict[str, Any],
+    sections: list[str] | None = None,
+) -> str:
+    """Build structured markdown for AI brainstorming."""
+    meta = data.get('meta', {})
+    project = meta.get('projectName') or 'Untitled Project'
+    lines = [
+        f'# {project} — AI Brainstorming Context\n',
+        f"**Genre:** {meta.get('genre') or 'Unspecified'}",
+        f"**Format:** {meta.get('format') or 'Novel'}",
+        f"**Author:** {meta.get('author') or 'Unknown'}",
+    ]
+    desc = meta.get('description')
+    if desc:
+        lines.append(f"\n**Description:** {desc}\n")
+    lines.append('')
+
+    section_map: dict[str, tuple[str, str, list[str]]] = {
+        'characters': (
+            'Characters', 'characters',
+            ['role', 'archetype', 'personality',
+             'motivations', 'fears', 'abilities',
+             'arcSummary', 'relationships',
+             'lies', 'truth', 'ghost'],
+        ),
+        'locations': (
+            'Locations', 'locations',
+            ['type', 'region', 'overview',
+             'storySignificance', 'atmosphere'],
+        ),
+        'factions': (
+            'Factions', 'factions',
+            ['type', 'leader', 'ideology', 'goals',
+             'overview', 'allies', 'enemies'],
+        ),
+        'plots': (
+            'Plot Arcs', 'plots',
+            ['type', 'status', 'synopsis',
+             'conflict', 'resolution'],
+        ),
+        'lore': (
+            'Lore & Concepts', 'lore',
+            ['category', 'overview',
+             'hiddenTruth', 'impact'],
+        ),
+        'systems': (
+            'Power Systems', 'systems',
+            ['type', 'overview', 'mechanics',
+             'costs', 'counters'],
+        ),
+        'timeline': (
+            'Timeline Events', 'timelineEvents',
+            ['date', 'type', 'scale', 'overview'],
+        ),
+    }
+
+    active = sections or list(section_map.keys())
+    for key in active:
+        if key not in section_map:
+            continue
+        title, col, fields = section_map[key]
+        items = data.get(col, [])
+        if not items:
+            continue
+        lines.append(f'\n## {title} ({len(items)})\n')
+        for item in items:
+            name = (
+                item.get('name')
+                or item.get('title')
+                or 'Untitled'
+            )
+            lines.append(f'### {name}')
+            for field in fields:
+                val = item.get(field)
+                if not val:
+                    continue
+                if isinstance(val, list):
+                    preview = ', '.join(str(v) for v in val)
+                else:
+                    preview = strip_html(str(val)).strip()
+                if preview:
+                    lines.append(
+                        f'- **{field}:** {preview[:800]}'
+                    )
+            lines.append('')
+
+    # Relationship summary
+    if not sections or 'relationships' in sections:
+        edges = build_relationship_index(data)
+        if edges:
+            lines.append('\n## Relationships\n')
+            for edge in edges[:50]:
+                lines.append(
+                    f"- {edge['source']} "
+                    f"→ {edge['target']} "
+                    f"({edge['type']})"
+                )
+            lines.append('')
+
+    return '\n'.join(lines)
 
 
 def build_world_bible(data: dict[str, Any]) -> str:

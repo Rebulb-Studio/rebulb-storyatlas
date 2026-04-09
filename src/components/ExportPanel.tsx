@@ -3,8 +3,9 @@ import type { Theme } from "../types";
 import { COLLECTION_DEFS } from "../constants";
 import { exportJSON, exportZIP, exportSelective } from "../api";
 import { useDataStore } from "../stores/useDataStore";
+import AIExportModal from "./AIExportModal";
 
-type ExportFormat = "json" | "zip" | "selective" | "csv";
+type ExportFormat = "json" | "zip" | "selective" | "csv" | "ai";
 
 interface Props {
   theme: Theme;
@@ -13,6 +14,7 @@ interface Props {
 
 export default function ExportPanel({ theme: t, toast }: Props) {
   const [format, setFormat] = useState<ExportFormat>("json");
+  const [showAIModal, setShowAIModal] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set(Object.keys(COLLECTION_DEFS)));
   const [exporting, setExporting] = useState(false);
   const data = useDataStore((s) => s.data);
