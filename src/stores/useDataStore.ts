@@ -85,8 +85,9 @@ export const useDataStore = create<DataState>((set, get) => ({
     // Try to sync with backend
     try {
       const created = await api.createEntry(collection, entry);
-      set((state) => ({
-        data: {
+      // Replace temp entry with server response
+      set((state) => {
+        const newData = {
           ...state.data,
           [collection]: (state.data[collection] || []).map((e) =>
             e.id === tempId ? created : e
@@ -119,8 +120,8 @@ export const useDataStore = create<DataState>((set, get) => ({
 
     try {
       const updated = await api.updateEntry(collection, id, updates);
-      set((state) => ({
-        data: {
+      set((state) => {
+        const newData = {
           ...state.data,
           [collection]: (state.data[collection] || []).map((e) =>
             e.id === id ? updated : e
@@ -155,7 +156,10 @@ export const useDataStore = create<DataState>((set, get) => ({
     }
   },
 
-  setData: (data) => set({ data }),
+  setData: (data) => {
+    saveToLocal(data);
+    set({ data });
+  },
 }));
 
 // ─── Auto-save to localStorage on every state change ────────
