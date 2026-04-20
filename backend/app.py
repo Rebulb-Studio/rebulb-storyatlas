@@ -6,20 +6,27 @@ import logging
 import os
 import re
 import sqlite3
+import time
+import uuid as _uuid
 import zipfile
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
-from flask import Flask, jsonify, request, send_file, Response
+from flask import Flask, abort, g, jsonify, request, send_file, Response
 from flask_cors import CORS
+from werkzeug.exceptions import HTTPException
 from werkzeug.utils import secure_filename
 
 BASE_DIR = Path(__file__).resolve().parent
-DIST_DIR = BASE_DIR.parent / 'dist'
-DB_PATH = BASE_DIR / 'worldforge.db'
-BACKUP_DIR = BASE_DIR / 'backups'
+DIST_DIR = Path(os.environ.get('REBULB_DIST_OVERRIDE', BASE_DIR.parent / 'dist')).resolve()
+DB_PATH = Path(os.environ.get('WORLDFORGE_DB_PATH', BASE_DIR / 'worldforge.db')).resolve()
+BACKUP_DIR = Path(os.environ.get('WORLDFORGE_BACKUP_DIR', DB_PATH.parent / 'backups')).resolve()
+DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+
+APP_VERSION = os.environ.get('APP_VERSION', 'dev')
 
 # Configure logging
 logging.basicConfig(
@@ -28,6 +35,14 @@ logging.basicConfig(
     handlers=[logging.StreamHandler()],
 )
 logger = logging.getLogger('storyatlas')
+
+
+def require_json_dict() -> dict[str, Any]:
+    """Parse request JSON or 400. Empty body is also 400 — an empty update is never intended."""
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict):
+        abort(400, description='Request body must be a JSON object')
+    return payload
 
 COLLECTIONS = [
     'characters', 'locations', 'factions', 'items', 'lore', 'history',
@@ -162,7 +177,69 @@ def create_app() -> Flask:
         CORS(app, origins=[cors_origin])
     else:
         CORS(app)
+
     init_db()
+
+    # In-process per-IP rate limiter for /api write methods.
+    # Keeps the shape simple for single-instance deploys; swap for Redis-backed
+    # bucketing when scaling beyond one Fly machine (Phase 4).
+    from collections import deque
+    _buckets: dict[str, deque[float]] = {}
+    _write_methods = {'POST', 'PUT', 'DELETE', 'PATCH'}
+    _rate_limit_per_minute = int(os.environ.get('API_WRITE_RPM', '120'))
+
+    def _rate_limit_ok(ip: str) -> bool:
+        now = time.time()
+        bucket = _buckets.setdefault(ip, deque())
+        # drop entries older than 60s
+        while bucket and now - bucket[0] > 60.0:
+            bucket.popleft()
+        if len(bucket) >= _rate_limit_per_minute:
+            return False
+        bucket.append(now)
+        return True
+
+    # Request observability: attach request id, log duration, apply rate limit.
+    @app.before_request
+    def _start_timer():
+        g.request_id = request.headers.get('X-Request-Id') or _uuid.uuid4().hex[:12]
+        g.started_at = time.perf_counter()
+        if (
+            request.path.startswith('/api/')
+            and request.method in _write_methods
+        ):
+            ip = request.headers.get('X-Forwarded-For', request.remote_addr or 'unknown').split(',')[0].strip()
+            if not _rate_limit_ok(ip):
+                logger.warning('Rate limit exceeded: ip=%s path=%s', ip, request.path)
+                abort(429, description=f'Rate limit exceeded: {_rate_limit_per_minute} writes per minute')
+
+    @app.after_request
+    def _log_request(response):
+        try:
+            duration_ms = int((time.perf_counter() - g.started_at) * 1000)
+            response.headers['X-Request-Id'] = g.request_id
+            response.headers['X-Response-Time'] = f'{duration_ms}ms'
+            if request.path.startswith('/api/'):
+                logger.info(
+                    'req=%s %s %s -> %s in %dms',
+                    g.request_id, request.method, request.path, response.status_code, duration_ms,
+                )
+        except Exception:  # never let logging break a response
+            pass
+        return response
+
+    @app.errorhandler(HTTPException)
+    def _json_http_error(err: HTTPException):
+        if request.path.startswith('/api/'):
+            return jsonify({'error': err.name, 'message': err.description}), err.code
+        return err
+
+    @app.errorhandler(Exception)
+    def _json_unhandled(err: Exception):
+        logger.exception('Unhandled error on %s %s: %s', request.method, request.path, err)
+        if request.path.startswith('/api/'):
+            return jsonify({'error': 'internal_error', 'message': 'An unexpected error occurred'}), 500
+        raise err
 
     @app.route('/')
     def index():
@@ -185,7 +262,7 @@ def create_app() -> Flask:
 
     @app.route('/api/meta', methods=['PUT'])
     def api_meta():
-        payload = request.get_json(silent=True) or {}
+        payload = require_json_dict()
         conn = get_connection()
         try:
             current = load_meta(conn)
@@ -206,7 +283,7 @@ def create_app() -> Flask:
             validate_collection(collection)
         except ValueError as exc:
             return jsonify({'error': str(exc)}), 400
-        payload = request.get_json(silent=True) or {}
+        payload = require_json_dict()
         entry_id = payload.get('id') or uuid4().hex[:12]
         ts = now_iso()
         entry = dict(payload)
@@ -244,7 +321,7 @@ def create_app() -> Flask:
             validate_collection(collection)
         except ValueError as exc:
             return jsonify({'error': str(exc)}), 400
-        payload = request.get_json(silent=True) or {}
+        payload = require_json_dict()
         conn = get_connection()
         existing = load_entry(conn, collection, entry_id)
         if existing is None:
@@ -299,13 +376,28 @@ def create_app() -> Flask:
 
     @app.route('/api/health')
     def api_health():
+        """Cheap liveness probe. Checks DB is reachable. Called by load balancer. Must stay fast."""
+        try:
+            conn = get_connection()
+            conn.execute('SELECT 1').fetchone()
+            conn.close()
+        except Exception as exc:
+            logger.error('Health check DB failure: %s', exc)
+            return jsonify({'ok': False, 'error': 'db_unreachable'}), 503
+        return jsonify({'ok': True, 'version': APP_VERSION})
+
+    @app.route('/api/metrics')
+    def api_metrics():
+        """Heavier deep-check: entry counts, corrupted-JSON count, DB size, last backup. Not called on every probe."""
         conn = get_connection()
         corrupted = 0
         total = 0
+        per_collection: dict[str, int] = {}
         for collection in COLLECTIONS:
             rows = conn.execute(
                 'SELECT data_json FROM entries WHERE collection_name = ?', (collection,)
             ).fetchall()
+            per_collection[collection] = len(rows)
             for row in rows:
                 total += 1
                 try:
@@ -313,10 +405,17 @@ def create_app() -> Flask:
                 except json.JSONDecodeError:
                     corrupted += 1
         conn.close()
+        db_size = DB_PATH.stat().st_size if DB_PATH.exists() else 0
+        backups = sorted(BACKUP_DIR.glob('backup_*.json'), key=lambda p: p.stat().st_mtime, reverse=True)
+        last_backup = backups[0].name if backups else None
         return jsonify({
-            'status': 'ok',
             'totalEntries': total,
             'corruptedEntries': corrupted,
+            'perCollection': per_collection,
+            'dbSizeBytes': db_size,
+            'lastBackup': last_backup,
+            'backupCount': len(backups),
+            'version': APP_VERSION,
         })
 
     @app.route('/api/export.json')
@@ -334,10 +433,7 @@ def create_app() -> Flask:
 
     @app.route('/api/import', methods=['POST'])
     def api_import_json():
-        payload = request.get_json(silent=True) or {}
-        if not isinstance(payload, dict):
-            return jsonify({'error': 'Invalid payload'}), 400
-
+        payload = require_json_dict()
         conn = get_connection()
         try:
             import_payload_into_db(conn, payload)
@@ -921,8 +1017,12 @@ def init_db() -> None:
 
 
 def get_connection() -> sqlite3.Connection:
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30)
     conn.row_factory = sqlite3.Row
+    conn.execute('PRAGMA journal_mode=WAL')
+    conn.execute('PRAGMA foreign_keys=ON')
+    conn.execute('PRAGMA synchronous=NORMAL')
+    conn.execute('PRAGMA busy_timeout=5000')
     return conn
 
 
@@ -1345,11 +1445,27 @@ def build_world_bible_html(data: dict[str, Any]) -> str:
     )
 
 
+# Initialize Sentry before create_app so errors during boot are also captured.
+_sentry_dsn = os.environ.get('SENTRY_DSN')
+if _sentry_dsn:
+    try:
+        import sentry_sdk
+        from sentry_sdk.integrations.flask import FlaskIntegration
+        sentry_sdk.init(
+            dsn=_sentry_dsn,
+            integrations=[FlaskIntegration()],
+            environment=os.environ.get('APP_ENV', 'production'),
+            release=APP_VERSION,
+            traces_sample_rate=float(os.environ.get('SENTRY_TRACES_SAMPLE_RATE', '0.0')),
+        )
+        logger.info('Sentry initialized (env=%s release=%s)', os.environ.get('APP_ENV'), APP_VERSION)
+    except ImportError:
+        logger.warning('sentry-sdk not installed; error reporting disabled')
+
 app = create_app()
 
 if __name__ == '__main__':
+    # Local dev only. Production uses: gunicorn --bind 0.0.0.0:$PORT wsgi:application
     port = int(os.environ.get('PORT', 5000))
-    debug = os.environ.get(
-        'FLASK_DEBUG', 'false'
-    ).lower() == 'true'
+    debug = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
     app.run(host='0.0.0.0', port=port, debug=debug)

@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { safeGetItem, safeSetItem, safeRemoveItem } from "../utils/safeStorage";
 
 interface ProState {
   isPro: boolean;
@@ -8,19 +9,20 @@ interface ProState {
 }
 
 export const useProStore = create<ProState>((set) => ({
-  isPro: localStorage.getItem("sa_pro_key") !== null,
-  proKey: localStorage.getItem("sa_pro_key"),
+  isPro: safeGetItem("sa_pro_key") !== null,
+  proKey: safeGetItem("sa_pro_key"),
 
   activateKey: (key: string) => {
     const trimmed = key.trim();
     if (!trimmed || trimmed.length < 8) return false;
-    localStorage.setItem("sa_pro_key", trimmed);
+    const res = safeSetItem("sa_pro_key", trimmed);
+    if (!res.ok) return false;
     set({ isPro: true, proKey: trimmed });
     return true;
   },
 
   deactivate: () => {
-    localStorage.removeItem("sa_pro_key");
+    safeRemoveItem("sa_pro_key");
     set({ isPro: false, proKey: null });
   },
 }));

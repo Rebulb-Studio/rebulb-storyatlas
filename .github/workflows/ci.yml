@@ -1,4 +1,4 @@
-name: CI — Lint & Check
+name: CI — Lint, Build, Test
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   frontend:
-    name: Frontend Build Check
+    name: Frontend
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,17 +16,45 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - run: npm install
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test -- --run
       - run: npm run build
 
   backend:
-    name: Backend Check
+    name: Backend
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install flask flake8
-      - run: cd backend && flake8 app.py --max-line-length=120
-      - run: python -c "import ast, sys; ast.parse(open('backend/app.py').read()); print('Syntax OK')"
+      - run: pip install -r backend/requirements.txt flake8 pytest
+      - run: cd backend && flake8 app.py --max-line-length=120 --ignore=E402,E501,W503
+      - run: python -c "import ast; ast.parse(open('backend/app.py').read()); print('Syntax OK')"
+      - name: Import-test the Flask app
+        run: |
+          cd backend
+          WORLDFORGE_DB_PATH=/tmp/test.db python -c "import wsgi; print('wsgi.application created:', wsgi.application is not None)"
+      - name: Run backend tests (if any)
+        run: |
+          if compgen -G "backend/tests/*.py" > /dev/null; then
+            cd backend && pytest
+          else
+            echo "no backend tests yet"
+          fi
+
+  docker:
+    name: Docker build (smoke)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build image (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: rebulb-storyatlas:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

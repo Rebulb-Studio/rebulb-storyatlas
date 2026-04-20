@@ -46,7 +46,7 @@ export interface StickyNote {
 export interface Toast {
   id: number;
   message: string;
-  type: "info" | "success" | "error";
+  type: "info" | "success" | "error" | "warning";
   exiting?: boolean;
 }
 

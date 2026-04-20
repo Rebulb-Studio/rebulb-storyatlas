@@ -1,0 +1,27 @@
+# Local parity with the production container. Run with: docker compose up --build
+# The /data volume lives on your host under ./data so restarts preserve your DB.
+
+services:
+  rebulb:
+    build: .
+    image: rebulb-storyatlas:dev
+    ports:
+      - "8080:8080"
+    environment:
+      APP_ENV: development
+      APP_VERSION: local
+      PORT: "8080"
+      WORLDFORGE_SECRET_KEY: "dev-not-a-real-secret-replace-me"
+      WORLDFORGE_DB_PATH: /data/worldforge.db
+      WORLDFORGE_BACKUP_DIR: /data/backups
+      REBULB_DIST_OVERRIDE: /app/dist
+      API_WRITE_RPM: "240"
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8080/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s

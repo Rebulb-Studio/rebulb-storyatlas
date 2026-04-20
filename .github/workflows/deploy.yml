@@ -1,0 +1,30 @@
+name: Deploy to Fly.io
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+concurrency:
+  group: fly-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Deploy
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          if [ -z "$FLY_API_TOKEN" ]; then
+            echo "::error::FLY_API_TOKEN secret is not set. Skipping deploy."
+            echo "Run: gh secret set FLY_API_TOKEN --body \"\$(fly auth token)\""
+            exit 1
+          fi
+          flyctl deploy --remote-only \
+            --build-arg APP_VERSION="${GITHUB_SHA::7}" \
+            --env APP_VERSION="${GITHUB_SHA::7}"
